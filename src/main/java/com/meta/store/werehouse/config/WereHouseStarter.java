@@ -13,7 +13,7 @@ import com.meta.store.werehouse.services.ClientService;
 import com.meta.store.werehouse.services.InvoiceService;
 
 
-@Configuration
+@Component
 public class WereHouseStarter implements CommandLineRunner {
 
 	@Autowired

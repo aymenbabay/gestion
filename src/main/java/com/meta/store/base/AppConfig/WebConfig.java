@@ -13,15 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class WebConfig {
 
-//	  @Bean
-//	    public DataSource getDataSource() {
-//	        return DataSourceBuilder.create()
-//	          .driverClassName("org.postgresql.Driver")
-//	          .url("jdbc:postgresql://localhost:5432/metaStore")
-//	          .username("postgres")
-//	          .password("password")
-//	          .build();	
-//	    }
+
 	  
 	@Bean
 	  public AuditorAware<String> auditorAware(){

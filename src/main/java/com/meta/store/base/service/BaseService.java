@@ -13,6 +13,7 @@ import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.repository.BaseRepository;
 
 import jakarta.persistence.MappedSuperclass;
+import lombok.RequiredArgsConstructor;
 
 @MappedSuperclass
 public class BaseService<T extends BaseEntity<ID>,ID extends Number> {
@@ -33,9 +34,10 @@ public class BaseService<T extends BaseEntity<ID>,ID extends Number> {
 		}
 	}
 	
-	public ResponseEntity<T> insert(T article) {
+	public ResponseEntity<T> insert(T entity) {
+		
 
-		baseRepository.save(article);
+		baseRepository.save(entity);
 		return	new ResponseEntity<T>(HttpStatus.OK);
 	}
 	

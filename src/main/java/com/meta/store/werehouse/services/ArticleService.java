@@ -13,13 +13,16 @@ import com.meta.store.werehouse.entity.Article;
 import com.meta.store.werehouse.repository.ArticleRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ArticleService extends BaseService<Article, Long> {
 
-	@Autowired
-	private ArticleRepository articleRepository;
+	
+	private final ArticleRepository articleRepository;
+	
 	
 //	public List<Article> getAll(){
 //		return articleRepository.findAll(Sort.by("id").ascending());
