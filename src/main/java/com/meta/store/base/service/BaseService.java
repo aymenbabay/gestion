@@ -2,6 +2,7 @@ package com.meta.store.base.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.repository.BaseRepository;
+import com.meta.store.base.security.entity.Role;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +27,10 @@ public class BaseService<T extends BaseEntity<ID>,ID extends Number> {
 		return  baseRepository.findAll();
 	}
 	
-	public Optional<T> getById(ID id) {
+	public ResponseEntity<T> getById(ID id) {
 		Optional<T> entity =  baseRepository.findById(id);
 		if(entity.isPresent()) {
-			return entity;
+			return ResponseEntity.ok(entity.get());
 		}else {
 			throw new RecordNotFoundException("this record with id: "+id+" not found");
 		}
@@ -49,6 +51,8 @@ public class BaseService<T extends BaseEntity<ID>,ID extends Number> {
 	public void deleteById(ID id) {
 				baseRepository.deleteById(id);
 	}
+
+	
 	
 	
 }

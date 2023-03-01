@@ -13,7 +13,7 @@ import lombok.Setter;
 public class ArticleDto {
 
 	@NotBlank(message = "Libelle field must not be empty")
-	private String libelle;
+	private String libell;
 	
 	@NotBlank(message = "Code Field Must not Be Empty")
 	private String code;
@@ -23,4 +23,5 @@ public class ArticleDto {
 	private String discription;
 	
 	private Double prix;
+	
 }

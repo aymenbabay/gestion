@@ -36,7 +36,7 @@ public class ArticleController {
 	
 	private final ArticleService articleService;
 	
-	//private final ArticleMapper articleMapper;
+	private final ArticleMapper articleMapper;
 	
 	private final BaseService<Article, Long> baseService;
 	
@@ -47,15 +47,9 @@ public class ArticleController {
 		List<ArticleDto> articleDto = new ArrayList<>();
 		for(Article i : article) {
 
-			for(int j = 0 ; j<articleDto.size(); j++) {
-				System.out.println("d5al");
-				ArticleDto artDto =  articleDto.get(j);
-				artDto.setCode(i.getCode());
-				System.out.println(artDto.getCode()+" artDto");
+				ArticleDto artDto =  articleMapper.mapToDto(i);
 				articleDto.add(artDto);
-			
-				
-			}
+		
 
 		}
 		return articleDto;
@@ -67,15 +61,10 @@ public class ArticleController {
 	}
 	
 	@GetMapping("/ar/{id}")
-	public ArticleDto getArticleById(@PathVariable Long id){
-		Optional<Article> article = baseService.getById(id);
-		ArticleDto dto = new ArticleDto();
-		dto.setCode(article.get().getCode());
-		dto.setDiscription(article.get().getDiscription());
-		dto.setLibelle(article.get().getLibelle());
-		dto.setPrix(article.get().getPrix());
-		dto.setRef(article.get().getRef());
-		return dto;
+	public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id){
+		ResponseEntity<Article> article = baseService.getById(id);
+		ArticleDto dto = articleMapper.mapToDto(article.getBody());
+		return ResponseEntity.ok(dto);
 		
 	}
 	

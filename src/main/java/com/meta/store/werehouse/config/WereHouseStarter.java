@@ -37,10 +37,10 @@ public class WereHouseStarter implements CommandLineRunner {
 	}
 	
 	private void insertInvoice() {
-		Invoice invoice = new Invoice();
-		invoice.setCode((long) 0);
-		invoice.setLibelle_article("article 1");
-		invoice.setQuantity((double)01);
+		Invoice invoice = new Invoice((long)0,"az",(double)0);
+//		invoice.setCode((long) 0);
+//		invoice.setLibelle_article("article 1");
+//		invoice.setQuantity((double)01);
 		invoiceService.insert(invoice);
 		
 	}

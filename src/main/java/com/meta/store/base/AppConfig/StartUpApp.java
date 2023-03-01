@@ -3,8 +3,10 @@ package com.meta.store.base.AppConfig;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.meta.store.base.security.entity.AppUser;
@@ -15,25 +17,27 @@ import com.meta.store.base.security.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class StartUpApp implements CommandLineRunner {
 
-	private final RoleService roleService;
+	@Autowired
+	private RoleService roleService;
 	
-	private final AppUserService appUserService;
+	@Autowired
+	private AppUserService appUserService;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	
 	public ResponseEntity<?> insertRole(String rol){
-		Role role = new Role();
-		role.setName(rol);
+		Role role = new Role(rol);
 		return roleService.insert(role);
 	}
 	
 	public ResponseEntity<?> insertUser(Set<Role> roles){
-		AppUser user = new AppUser();
-		user.setFullName("aymen babay");
-		user.setUserName("aymen1");
-		user.setPassword("password");
-		user.setRoles(roles);
+		
+		AppUser user = new AppUser("aymen babay","user","aymen1",passwordEncoder.encode("password"),roles);
+		
 		return appUserService.insert(user);
 	}
 	@Override

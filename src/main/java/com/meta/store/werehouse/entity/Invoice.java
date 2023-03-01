@@ -23,6 +23,10 @@ import lombok.Setter;
 @Table(name="invoice_werehouse")
 public class Invoice extends BaseEntity<Long>{
 
+	public Invoice(long l, String string, double d) {
+		// TODO Auto-generated constructor stub
+	}
+
 	private Long code;
 	
 	private String ref_article;

@@ -10,16 +10,19 @@ import com.meta.store.werehouse.entity.Invoice;
 import com.meta.store.werehouse.repository.InvoiceRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class InvoiceService extends BaseService<Invoice, Long>  {
 
-	@Autowired
-	private InvoiceRepository invoiceRepository;
+	
+	private final InvoiceRepository invoiceRepository;
 	
 	@Override
 	public ResponseEntity<Invoice> insert(Invoice invoice) {
+		
 		return super.insert(invoice);
 	}
 	

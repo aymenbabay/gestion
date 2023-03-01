@@ -1,6 +1,7 @@
 package com.meta.store.base.security.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,8 @@ public class RoleService extends BaseService<Role, Long> {
 		return super.getAll();
 	}
 	
-	public Role findById(Long id) {
-		return super.getById(id).orElse(null);
+	public ResponseEntity<Role> findById(Long id) {
+		return super.getById(id);
 	}
 	
 	public Role findByName(String name) {
@@ -33,5 +34,9 @@ public class RoleService extends BaseService<Role, Long> {
 	
 	public ResponseEntity<Role> insert(Role role){
 		return super.insert(role);
+	}
+	
+	public Set<Role> FindRoleByUserId(Long id){
+		return roleRepository.findRolesByUserId(id);
 	}
 }

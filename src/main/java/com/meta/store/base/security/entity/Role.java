@@ -17,5 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Role extends BaseEntity<Long>{
 
+	
+
 	private String name;
 }
