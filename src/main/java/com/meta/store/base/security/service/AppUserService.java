@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AppUserService extends BaseService<AppUser, Long> {
+public class AppUserService  {
 
 	private final AppUserRepository appUserRepository;
 	
@@ -40,13 +40,16 @@ public class AppUserService extends BaseService<AppUser, Long> {
 	private final RoleService roleService;
 	
 	public List<AppUser> findAll(){
-		return super.getAll();
+		return appUserRepository.findAll();
 	}
 	
-	public ResponseEntity<AppUser> findById(Long id) {
-		return super.getById(id);
+	public Optional<AppUser> findById(Long id) {
+		return appUserRepository.findById(id);
 	}
 	
+	public ResponseEntity<AppUser> insert(AppUser user) {
+		return ResponseEntity.ok(appUserRepository.save(user));
+	}
 	public AppUser findByUserName(String name) {
 		return appUserRepository.findByUserName(name).orElse(null);
 	}

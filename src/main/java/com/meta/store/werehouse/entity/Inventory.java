@@ -5,8 +5,11 @@ import java.util.List;
 
 import com.meta.store.base.Entity.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +24,6 @@ import lombok.Setter;
 @Table(name="inventory_werehouse")
 public class Inventory extends BaseEntity<Long> {
 
-	@OneToMany(mappedBy = "inventory")
-	private List<Article> article;
 	
 	private Double current_quantity;
 	
@@ -34,5 +35,15 @@ public class Inventory extends BaseEntity<Long> {
 	
 	private Long id_article;
 	
+	private String bestClient;
+	
+	private Double articleCost;
+	
+	private Double articleSelling;
+	
+
+	@OneToOne()
+	@JoinColumn(name = "company_id",referencedColumnName = "id")
+	private Company company;
 	
 }

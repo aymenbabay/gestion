@@ -2,6 +2,7 @@ package com.meta.store.base.security.config;
 
 import java.io.IOException;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private final JwtService jwtService;
 	
+	
+	public String userName;
+	
 	@Override
 	protected void doFilterInternal(
 			 HttpServletRequest request,
@@ -40,9 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 		jwt = authHeader.substring(7);
-		userName = jwtService.extractUserName(jwt);
-		if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+		this.userName = jwtService.extractUserName(jwt);
+		if(this.userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			UserDetails userDetails = userDetailsService.loadUserByUsername(this.userName);
 			if(jwtService.isTokenValid(jwt, userDetails)) {
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 					 userDetails, null,

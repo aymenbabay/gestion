@@ -26,22 +26,18 @@ public class WereHouseStarter implements CommandLineRunner {
 	private InvoiceService invoiceService;
 	
 	private void insertArticle() {
-		Article article = new Article("article 1","code1","01", "art1 is wondrfull","name1");
+		Article article = new Article("article 1","code1","01", "art1 is wondrfull");
 		articleService.insert(article);
 	}
 	
 	private void insertClient() {
-		Client client = new Client("aymen","aymen.babay@esprit.tn");
+		Client client = new Client("aymen","code","aymen.babay@esprit.tn");
 		clientService.insert(client);
 		
 	}
 	
 	private void insertInvoice() {
-		Invoice invoice = new Invoice((long)0,"az",(double)0);
-//		invoice.setCode((long) 0);
-//		invoice.setLibelle_article("article 1");
-//		invoice.setQuantity((double)01);
-		invoiceService.insert(invoice);
+
 		
 	}
 

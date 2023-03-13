@@ -4,6 +4,7 @@ package com.meta.store.base.AppConfig;
 import javax.sql.DataSource;
 
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -17,22 +18,27 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.meta.store.base.error.RecordNotFoundException;
+import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.repository.AppUserRepository;
+import com.meta.store.base.security.service.AppUserService;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
+@EnableCaching
 @RequiredArgsConstructor
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class WebConfig {
 
 
 	private final AppUserRepository appUserRepository;
+
 	  
 	@Bean
-	  public AuditorAware<String> auditorAware(){
-		return new AuditorAwareImpl();
+	public AuditorAware<String> auditorAware(JwtAuthenticationFilter jwtAuthenticationFilter) {
+	    return new AuditorAwareImpl(jwtAuthenticationFilter);
 	}
+
 	
 
 	  @Bean
@@ -52,7 +58,7 @@ public class WebConfig {
 			  authProvider.setUserDetailsService(userDetailsService());
 			  authProvider.setPasswordEncoder(passwordEncoder());
 			  return authProvider;
-		  }
+		  } 
 
 		
 		@Bean
