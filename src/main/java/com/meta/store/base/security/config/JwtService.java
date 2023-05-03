@@ -9,7 +9,10 @@ import java.util.function.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.meta.store.base.error.JWTExpired;
+
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -39,17 +42,21 @@ public class JwtService {
 				.setSubject(userDetails.getUsername())
 				.claim("Authorization", userDetails.getAuthorities())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 240))
+				.setExpiration(new Date(System.currentTimeMillis() + 10000000 * 24 * 7))
 				.signWith(getSignInKey(), SignatureAlgorithm.HS256)
 				.compact();
 	}
 	
 	public Boolean isTokenValid(String token, UserDetails userDetails) {
 		final String userName = extractUserName(token);
+		try {
 		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+		 } catch (JWTExpired e) {
+		        return false;
+		    }
 	}
 	
-	private boolean isTokenExpired(String token) {
+	private boolean isTokenExpired(String token)  {
 		return extractExpration(token).before(new Date());
 	}
 
@@ -60,12 +67,16 @@ public class JwtService {
 	}
 
 	private Claims extractAllClaims(String token) {
+		try {
 		return Jwts
 				.parserBuilder()
 				.setSigningKey(getSignInKey())
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
+		} catch (ExpiredJwtException e) {
+	        throw new JWTExpired("Token expired");
+	    }
 	}
 
 	private Key getSignInKey() {

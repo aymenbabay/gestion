@@ -3,6 +3,7 @@ package com.meta.store.werehouse.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.base.security.entity.AppUser;
 import com.meta.store.werehouse.entity.Article;
@@ -25,6 +26,7 @@ import lombok.Setter;
 public class ClientDto extends BaseDto<Long> implements Serializable{
 
 
+	
 	@NotBlank(message = "Client Name Field Must Not Be Empty")
 	private String name;
 

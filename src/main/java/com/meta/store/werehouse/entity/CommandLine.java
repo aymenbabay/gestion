@@ -32,7 +32,11 @@ public class CommandLine extends BaseEntity<Long>{
 	
 	private Double prix_article_unit;
 
+	private Double tot_tva;
+
+	private Double prix_article_tot;
+
 	@ManyToOne
-	@JoinColumn(name = "clientId")
+	@JoinColumn(name = "invoiceId")
 	private Invoice invoice;
 }

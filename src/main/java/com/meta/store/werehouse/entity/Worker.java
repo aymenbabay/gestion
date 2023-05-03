@@ -26,11 +26,11 @@ public class Worker extends BaseEntity<Long> {
 	//@UniqueElements(message = "Worker Name Must Be Unique")
 	private String name;
 	
-	private String phone;
-	
-	private String email;
-	
-	private String address;
+//	private String phone;
+//	
+//	private String email;
+//	
+//	private String address;
 	
 	private Double salary;
 	

@@ -10,5 +10,9 @@ public interface AppUserRepository extends BaseRepository<AppUser, Long> {
 
 	Optional<AppUser> findByUserName(String userName);
 
+	Optional<AppUser> findByEmail(String email);
+
+	boolean existsByUserName(String username);
+
 
 }

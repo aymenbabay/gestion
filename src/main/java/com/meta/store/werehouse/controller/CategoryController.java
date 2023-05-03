@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 @Validated
 @RestController
 @RequestMapping("/werehouse/category")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -51,19 +54,11 @@ public class CategoryController {
 	
 	private final CompanyService companyService;
 	
+
 	@GetMapping("/getbycompany")
 	public ResponseEntity<List<CategoryDto>> getCategoryByCompany(){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		List<Category> categorys = categoryService.getAllByCompanyId(companyId);
-		if(!categorys.isEmpty()) {
-		List<CategoryDto> categorysDto = new ArrayList<>();
-		for(Category i : categorys) {
-			CategoryDto categoryDto = categoryMapper.mapToDto(i);
-			categorysDto.add(categoryDto);
-		}
-		return ResponseEntity.ok(categorysDto);}
-		throw new RecordNotFoundException("there is no category");
+		
+		return categoryService.getCategoryByCompany();
 	}
 	
 	@GetMapping("/l/{name}")
@@ -107,7 +102,7 @@ public class CategoryController {
 		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	public void deleteCategoryById(@PathVariable Long id){
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);

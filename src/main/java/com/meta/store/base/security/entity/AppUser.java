@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.werehouse.entity.Company;
 import com.meta.store.werehouse.entity.Worker;
@@ -31,6 +32,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,33 +46,24 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AppUser  implements UserDetails{
+public class AppUser extends BaseEntity<Long> implements UserDetails {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 	
-	@CreatedBy
-	@Column(updatable = false)
-	private String createdBy;
+	private String phone;
 	
-	@CreatedDate
-	@Column(updatable = false)
-	private LocalDateTime createdDate;
+	private String address;
 	
-	@LastModifiedBy
-	private String lastModifiedBy;
-	
-	@LastModifiedDate
-	private LocalDateTime lastModifiedDate;
-
-	private String firstname;
-	
+	@NotBlank(message = "User Name Field Must Be Not Empty")
 	private String userName;
 	
 	private String email;
-	
+
+	@NotBlank(message = "Password Field Must Be Not Empty")
 	private String password;
+	
+	private String resetToken;
+	
+	private LocalDateTime dateToken;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name ="userId"), inverseJoinColumns = @JoinColumn(name="roleId"))
@@ -121,9 +114,9 @@ public class AppUser  implements UserDetails{
 		return true;
 	}
 
-	public AppUser(String firstname, String userName, String email, String password, Set<Role> roles) {
+	public AppUser(String phone, String userName, String email, String password, Set<Role> roles) {
 		super();
-		this.firstname = firstname;
+		this.phone = phone;
 		this.userName = userName;
 		this.email = email;
 		this.password = password;

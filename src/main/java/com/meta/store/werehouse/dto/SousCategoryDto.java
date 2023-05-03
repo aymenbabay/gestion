@@ -2,6 +2,7 @@ package com.meta.store.werehouse.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.werehouse.entity.Article;

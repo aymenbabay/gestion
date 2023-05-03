@@ -50,61 +50,45 @@ public class ClientController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<ClientDto> insertClient(@RequestBody @Valid ClientDto clientDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		return clientService.insertClient(clientDto, company);
+		return clientService.insertClient(clientDto);
 	}
 	
-	@PostMapping("/add_exist/{id}")
+	@GetMapping("/add_exist/{id}")
 	public ResponseEntity<String> addExistClient(@PathVariable Long id){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return clientService.addExistClient(id,company);
 	}
 	
-	@PostMapping("/add_me")
-	public ResponseEntity<ClientDto2> addMeAsClient(@RequestBody ClientDto2 clientDto){
+	@PostMapping("/add_me_exist")
+	public ResponseEntity<ClientDto2> addMeAsClientExist(@RequestBody ClientDto2 clientDto){
 		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
-		Company company = companyService.findCompanyIdByUserId(user.getId());
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		return clientService.addMeAsClient(clientDto,user,company);
+		Company company = getCompany();
+		return clientService.addMeAsClientExist(clientDto,user,company);
+	}
+	
+	@GetMapping("/add_me/{code}")
+	public void addMeAsClient(@PathVariable String code) {
+		Company company = getCompany();
+		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
+		clientService.addMeAsClient(company, user, code);
+		
 	}
 	
 	@GetMapping("/get_all_my")
-	public List<ClientDto2> getMybyCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+	public List<ClientDto> getMybyCompany() {
+		Company company = getCompany();
 		return clientService.getMybyCompanyId(company);
 	}
 	
 	@GetMapping("/get_my_by_code/{code}")
 	public ClientDto getMyByCode(@PathVariable @Valid String code) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return clientService.getMyByCodeAndCompanyId(code,company);
 	}
 
 	@GetMapping("/get_my_by_name/{name}")
 	public List<ClientDto> getMyByName(@PathVariable @Valid String name) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return clientService.getMyByNameAndCompanyId(name,company);
 	}
 	
@@ -128,25 +112,26 @@ public class ClientController {
 	
 	@PutMapping("/update/{id}")
 	public ClientDto upDateMyClientById(@PathVariable Long id, @RequestBody ClientDto clientDto) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		return clientService.upDateMyClientById(id,clientDto,company,userId,authenticationFilter.userName);
+		Company company = getCompany();
+		return clientService.upDateMyClientById(id,clientDto,company,company.getUser().getId(),authenticationFilter.userName);
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public void deleteClient(@PathVariable Long id) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		clientService.deleteClientById(id,userId,authenticationFilter.userName,company);
+		Company company = getCompany();
+		clientService.deleteClientById(id,company.getUser().getId(),company);
 		
 	}
 
+	private Company getCompany() {
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company != null) {
+			return company;
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
+	}
 }
 
 

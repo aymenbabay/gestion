@@ -2,6 +2,7 @@ package com.meta.store.werehouse.entity;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.security.entity.AppUser;

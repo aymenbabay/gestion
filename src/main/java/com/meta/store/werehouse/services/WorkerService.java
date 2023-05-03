@@ -66,5 +66,17 @@ public class WorkerService  extends BaseService<Worker, Long>{
 	public Optional<Worker> getByIdAndCompanyId(Long id , Long companyId) {
 		return workerRepository.findByIdAndCompanyId(id, companyId);
 	}
+
+	public Long getByName(String name) {
+		return workerRepository.findByName(name);
+	}
+
+	public Long getCompanyIdByUserName(String userName) {
+		Long companyId = workerRepository.findByName(userName);
+		if(companyId != null) {
+			return companyId;
+		}
+		return null;
+	}
 	
 }

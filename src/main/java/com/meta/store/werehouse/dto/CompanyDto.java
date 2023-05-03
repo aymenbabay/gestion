@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.base.security.entity.AppUser;
@@ -24,6 +25,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,11 +35,12 @@ import lombok.Setter;
 @Setter
 public class CompanyDto extends BaseDto<Long> implements Serializable{
 	
-	private String companyName;
+	@NotBlank(message = "CompanyName Must Be Not Empty")
+	private String name;
 	
 	private String identityNumber;
 
-	private String National_id_number;
+	private String nationalIdNumber;
 	
 	private String address;
 	
@@ -47,16 +50,20 @@ public class CompanyDto extends BaseDto<Long> implements Serializable{
 	
 	private String logo;
 	
-	private String workForce;
+	private int workForce;
 	
 	private String legalStructure;
 	
 	private String taxStatus;
 	
+	private String phone;
+	
+	private String email;
+	
 	private AppUser user;
 	
-	private Set<Client> clients = new HashSet<>();
+	//private Set<Client> clients = new HashSet<>();
 
-	private Set<Fournisseur> fournisseurs = new HashSet<>();
+	//private Set<Fournisseur> fournisseurs = new HashSet<>();
 	
 }

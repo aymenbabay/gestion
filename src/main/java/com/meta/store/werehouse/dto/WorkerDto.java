@@ -18,16 +18,18 @@ import lombok.Setter;
 public class WorkerDto extends BaseDto<Long> implements Serializable {
 	
 	private String name;
-	
-	private String phone;
-	
-	private String email;
-	
-	private String address;
-	
-	private Double salary;
+//	
+//	private String phone;
+//	
+//	private String email;
+//	
+//	private String address;
 	
 	private AppUser user;
 
-	private Company company;
+//	private Company company;
+
+	private Double salary;
+	
+
 }

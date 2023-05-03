@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
+import com.meta.store.base.security.entity.AppUser;
 import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
 import com.meta.store.werehouse.dto.WorkerDto;
@@ -88,15 +89,20 @@ private final BaseService<Worker, Long> baseService;
 	public ResponseEntity<WorkerDto> insertWorker(@RequestBody @Valid WorkerDto workerDto){
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
-		ResponseEntity<Worker> worker1 = workerService.getByNameAndCompanyId(workerDto.getName(),company.getId());
-		if(worker1 == null)  {
-		Worker worker = workerMapper.mapToEntity(workerDto);
+		Long worker1 = workerService.getByName(workerDto.getName());
+		if(worker1 !=null)  {
+			throw new RecordIsAlreadyExist("is already exist");
+		}
+		
+		AppUser user = appUserService.findByUserName(workerDto.getName());
+		Worker worker = new Worker();
+		worker.setName(workerDto.getName());
+		worker.setUser(user);
+		worker.setSalary(workerDto.getSalary());
 		worker.setCompany(company);
 		baseService.insert(worker);
 		return new ResponseEntity<WorkerDto>(HttpStatus.ACCEPTED);
-		}else {
-			throw new RecordIsAlreadyExist("is already exist");
-		}
+		
 	}
 	
 	@PutMapping("/update")
@@ -108,7 +114,7 @@ private final BaseService<Worker, Long> baseService;
 		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	public void deleteWorkerById(@PathVariable Long id){
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);

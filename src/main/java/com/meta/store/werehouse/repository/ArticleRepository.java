@@ -29,6 +29,10 @@ public interface ArticleRepository extends BaseRepository<Article,Long> {
 
 	List<Article> findAllByCompanyId(Long companyId);
 
+	Optional<Article> findByCodeAndCompanyId(String code_article, Long companyId);
+
+	void deleteByIdAndCompanyId(Long id, Long companyId);
+
 
 
 }

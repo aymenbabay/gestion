@@ -45,8 +45,6 @@ public class FournisseurController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<FournisseurDto> insertFournisseur(@RequestBody  FournisseurDto fournisseurDto){
-		System.out.println("cooooooooooooooooooooooooode");
-		System.out.println(fournisseurDto.getCode()+"cooooooooooooooooooooooooode");
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		if(company == null) {
@@ -55,7 +53,7 @@ public class FournisseurController {
 		return fournisseurService.insertFournisseur(fournisseurDto, company);
 	}
 	
-	@PostMapping("/add_exist/{id}")
+	@GetMapping("/add_exist/{id}")
 	public ResponseEntity<String> addExistFournisseur(@PathVariable Long id){
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
@@ -65,7 +63,7 @@ public class FournisseurController {
 		return fournisseurService.addExistFournisseur(id,company);
 	}
 	
-	@PostMapping("/add_me")
+	@PostMapping("/add_me_exist")
 	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(@RequestBody FournisseurDto2 fournisseurDto){
 		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
 		Company company = companyService.findCompanyIdByUserId(user.getId());
@@ -73,6 +71,17 @@ public class FournisseurController {
 			throw new RecordNotFoundException("You Do Not Have A Company");
 		}
 		return fournisseurService.addMeAsFournisseur(fournisseurDto,user,company);
+	}
+	
+	@GetMapping("/add_me/{code}")
+	public void addMeAsProvider(@PathVariable String code) {
+		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
+		Company company = companyService.findCompanyIdByUserId(user.getId());
+		if(company == null) {
+			throw new RecordNotFoundException("You Do Not Have A Company");
+		}
+		fournisseurService.addMeAsProvider(company, user, code);
+		
 	}
 	
 	@GetMapping("/get_all_my")
@@ -125,6 +134,7 @@ public class FournisseurController {
 	
 	@PutMapping("/update/{id}")
 	public FournisseurDto upDateMyFournisseurById(@PathVariable Long id, @RequestBody FournisseurDto fournisseurDto) {
+		System.out.println("haw fi update provider"+fournisseurDto.getId());
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		if(company == null) {

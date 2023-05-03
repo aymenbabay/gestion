@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.meta.store.base.error.RecordNotFoundException;
+import com.meta.store.base.security.config.JwtAuthenticationFilter;
+import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
 import com.meta.store.werehouse.dto.CategoryDto;
 import com.meta.store.werehouse.entity.Article;
@@ -28,6 +31,16 @@ public class CategoryService extends BaseService<Category, Long> {
 	private final CategoryMapper categoryMapper;
 	
 	private final CategoryRepository categoryRepository;
+	
+	private final ImageService imageService; // i will use it
+
+	private final JwtAuthenticationFilter authenticationFilter;
+	
+	private final AppUserService appUserService;
+	
+	private final CompanyService companyService;
+	
+
 	
 	public ResponseEntity<CategoryDto> upDateCategory( CategoryDto categoryDto, Company company) {
 		Optional<Category> category = categoryRepository.findByIdAndCompanyId(categoryDto.getId(),company.getId());
@@ -64,4 +77,27 @@ public class CategoryService extends BaseService<Category, Long> {
 	}
 	
 
+	private Company getCompany() {
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company != null) {
+			return company;
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
+	}
+
+	public ResponseEntity<List<CategoryDto>> getCategoryByCompany() {
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
+		List<Category> categorys = getAllByCompanyId(companyId);
+		if(!categorys.isEmpty()) {
+		List<CategoryDto> categorysDto = new ArrayList<>();
+		for(Category i : categorys) {
+			CategoryDto categoryDto = categoryMapper.mapToDto(i);
+			categorysDto.add(categoryDto);
+		}
+		return ResponseEntity.ok(categorysDto);}
+		throw new RecordNotFoundException("there is no category");
+	}
 }

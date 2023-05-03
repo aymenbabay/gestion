@@ -14,9 +14,9 @@ import lombok.Setter;
 @Setter
 public class CommandLineDto extends BaseDto<Long> implements Serializable{
 
-	private String code_article;
+	private String codeArticle;
 	
-	private String libelle_article;
+	private String libelleArticle;
 	
 	private Double quantity;
 	
@@ -24,8 +24,11 @@ public class CommandLineDto extends BaseDto<Long> implements Serializable{
 
 	private Double tva;
 	
-	private Double prix_article_unit;
+	private Double prixArticleUnit;
 
-	
 	private Invoice invoice;
+
+	private Double totTva;
+
+	private Double prixArticleTot;
 }

@@ -8,9 +8,6 @@ import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.werehouse.entity.Client;
 import com.meta.store.werehouse.entity.Company;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 @Getter
@@ -23,12 +20,19 @@ public class InvoiceDto extends BaseDto<Long> implements Serializable {
 	
 	private Double tot_tva_invoice;
 		
-	private Double prix_article_tot;
+	private Double prix_tot_article;
 	
 	private Double prix_invoice_tot;
 	
-	private LocalDateTime date_invoice;
+	private Boolean status;
+	
+	private LocalDateTime createdDate;
 
+	private LocalDateTime LastModifiedDate;
+	
+	private String LastModifiedBy;
+	
+	private String CreatedBy;
 
 	private Client client;
 	

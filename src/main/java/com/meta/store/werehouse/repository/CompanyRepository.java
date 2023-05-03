@@ -11,7 +11,7 @@ public interface CompanyRepository extends BaseRepository<Company, Long> {
 	//@Query(value = "select art from Company art join art.department dept where dept.id = :deptId")
 	//Company findCompanyByUserId(Long id);
 
-	long countByCompanyName(String companyName);
+	long countByName(String name);
 
 	long countByUserId(Long id);
 	

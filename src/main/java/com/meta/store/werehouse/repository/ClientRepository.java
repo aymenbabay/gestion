@@ -36,6 +36,7 @@ public interface ClientRepository extends BaseRepository<Client, Long> {
 	Optional<Client> findByUserId(Long userId);
 	
 	
+	
 //	@Modifying
 //	@Query("delete FROM Client c JOIN c.companies co WHERE c.id = :id")
 //	void deleteByClientId(Long id);

@@ -82,8 +82,24 @@ public class SousCategoryController {
 		
 	}
 	
+	@GetMapping("/{categoryId}")
+	public List<SousCategoryDto> getAllSousCategoriesByCompanyIdAndCategoryId(@PathVariable Long categoryId){
+		System.out.println("haw j categoryId"+categoryId);
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company == null) {
+			throw new RecordNotFoundException("You Have No Company Please Create One :) ");
+		}
+		List<SousCategoryDto> sousCategoryDto = sousCategoryService.getByCompanyIdAndCategoryId(company.getId(),categoryId);
+		if(sousCategoryDto == null) {
+			throw new RecordNotFoundException("there is no sous category inside this category");
+		}
+		return sousCategoryDto;
+	}
+	
 	@PostMapping("/add")
-	public ResponseEntity<SousCategoryDto> insertSousCategory(@RequestBody @Valid SousCategoryDto sousCategoryDto){
+	public ResponseEntity<SousCategoryDto> insertSousCategory(@RequestBody SousCategoryDto sousCategoryDto){
+		System.out.println("haw j sous");
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		ResponseEntity<SousCategory> sousCategory1 = sousCategoryService.getByLibelleAndCompanyId(sousCategoryDto.getLibelle(),company.getId());
@@ -106,7 +122,7 @@ public class SousCategoryController {
 		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	public void deleteSousCategoryById(@PathVariable Long id){
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);

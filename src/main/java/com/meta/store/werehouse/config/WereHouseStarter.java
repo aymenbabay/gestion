@@ -26,7 +26,7 @@ public class WereHouseStarter implements CommandLineRunner {
 	private InvoiceService invoiceService;
 	
 	private void insertArticle() {
-		Article article = new Article("article 1","code1","01", "art1 is wondrfull");
+		Article article = new Article("article 1","code1","01", "art1 is wondrfull",(double)4);
 		articleService.insert(article);
 	}
 	
@@ -43,10 +43,11 @@ public class WereHouseStarter implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		insertArticle();
-		insertClient();
-		insertInvoice();
-		
+//		if(articleService.getById((long)1) == null) {
+//		insertArticle();
+//		insertClient();
+//		insertInvoice();
+//		}
 		
 	}
 }

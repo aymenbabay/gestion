@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 
 import com.meta.store.base.repository.BaseRepository;
 import com.meta.store.werehouse.entity.SousCategory;
@@ -19,5 +20,7 @@ public interface SousCategoryRepository extends BaseRepository<SousCategory,Long
 	Optional<SousCategory> findByIdAndCompanyId(Long id, Long id2);
 
 	Optional<SousCategory> findByLibelleAndCompanyId(String libelle, Long companyId);
+
+	List<SousCategory> findAllByCompanyIdAndCategoryId(Long id, Long categoryId);
 
 }

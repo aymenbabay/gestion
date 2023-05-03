@@ -33,7 +33,7 @@ public class Inventory extends BaseEntity<Long> {
 	
 	private String libelle_article;
 	
-	private Long id_article;
+	private String articleCode;
 	
 	private String bestClient;
 	

@@ -1,8 +1,10 @@
 package com.meta.store.werehouse.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 import com.meta.store.base.error.NotPermissonException;
 import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
+import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.entity.AppUser;
+import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
 import com.meta.store.werehouse.dto.ClientDto;
 import com.meta.store.werehouse.dto.ClientDto2;
@@ -43,9 +47,16 @@ public class ClientService extends BaseService<Client, Long> {
 	
 	private final ClientRepository clientRepository;
 
+	private final JwtAuthenticationFilter authenticationFilter;
 	
-	@CacheEvict(value = "client", key = "#root.methodName", allEntries = true)
-	public ResponseEntity<ClientDto> insertClient(@Valid ClientDto clientDto, Company company) {
+	private final AppUserService appUserService;
+	
+	private final CompanyService companyService;
+
+	
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
+	public ResponseEntity<ClientDto> insertClient(@Valid ClientDto clientDto) {
+		Company company = getCompany();
 		if(company == null) {
 			throw new RecordNotFoundException("You Have No Company Please Create One first");
 		}else {
@@ -63,7 +74,7 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 	
 
-	@CacheEvict(value = "client", key = "#root.methodName")
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public ResponseEntity<String> addExistClient(Long id, Company company) {
 		ResponseEntity<Client> client = super.getById(id);
 		if(client != null) {
@@ -85,8 +96,8 @@ public class ClientService extends BaseService<Client, Long> {
 
 
 
-	@CacheEvict(value = "client", key = "#root.methodName")
-	public ResponseEntity<ClientDto2> addMeAsClient(ClientDto2 clientDto, AppUser user, Company company) {
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
+	public ResponseEntity<ClientDto2> addMeAsClientExist(ClientDto2 clientDto, AppUser user, Company company) {
 		Optional<Client> client2 = clientRepository.findByUserId(user.getId());
 		if(client2.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Client");
@@ -101,21 +112,21 @@ public class ClientService extends BaseService<Client, Long> {
 		return null;
 	}
 
-	@Cacheable(value = "client", key = "#root.methodName")
-	public List<ClientDto2> getMybyCompanyId(Company company) {
+	@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
+	public List<ClientDto> getMybyCompanyId(Company company) {
 		List<Client> client = clientRepository.getAllByCompanyId(company.getId());
 		if(client.isEmpty()) {
 			throw new RecordNotFoundException("You Have No Client");
 		}
-		List<ClientDto2> clientDto2 = new ArrayList<>();
+		List<ClientDto> clientDto = new ArrayList<>();
 		for(Client i : client) {
-		ClientDto2 clientDto = clientMapper2.mapToDto(i);
-		clientDto2.add(clientDto);
+		ClientDto clientDto1 = clientMapper.mapToDto(i);
+		clientDto.add(clientDto1);
 		}
-		return clientDto2;
+		return clientDto;
 	}
 
-	@Cacheable(value = "client", key = "#root.methodName")
+	@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
 	public ClientDto getMyByCodeAndCompanyId(@Valid String code, Company company) {
 		Optional<Client> client = clientRepository.findByCodeAndCompanyId(code,company.getId());
 		if(client.isPresent()) {
@@ -124,7 +135,9 @@ public class ClientService extends BaseService<Client, Long> {
 		}else throw new RecordNotFoundException("There Is No Client Has Code : "+code);
 	}
 
-	@Cacheable(value = "client", key = "#root.methodName")
+
+
+	@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
 	public List<ClientDto> getMyByNameAndCompanyId(@Valid String name, Company company) {
 		List<Client> client = clientRepository.findByNameAndCompanyId(name,company.getId());
 		if(client.isEmpty()) {
@@ -139,7 +152,8 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 
 
-	@Cacheable(value = "client", key = "#root.methodName")
+	//@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
+	// for developpers
 	public List<ClientDto> getAllClient() {
 		List<Client> clients = super.getAll();
 		if(clients == null) {
@@ -154,7 +168,7 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 
 
-	@Cacheable(value = "client", key = "#root.methodName")
+	@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
 	public ClientDto getClientByCode(String code) {
 		Optional<Client> client = clientRepository.findByCode(code);
 		if(client.isEmpty()) {
@@ -168,7 +182,7 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 
 
-	@Cacheable(value = "client", key = "#root.methodName")
+	@Cacheable(value = "client", key = "#root.methodName + '_' + #company.id")
 	public List<ClientDto> getAllClientByName(String name) {
 		List<Client> clients = clientRepository.findByName(name);
 		if(clients.isEmpty()) {
@@ -183,7 +197,7 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 
 
-	@CacheEvict(value = "client", key = "#root.methodName")
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public ClientDto upDateMyClientById(Long id, ClientDto clientDto, Company company, Long userId,String username) {
 		ResponseEntity<Client> client = super.getById(id);
 		if(client == null) {
@@ -214,20 +228,63 @@ public class ClientService extends BaseService<Client, Long> {
 	}
 
 
-	@CacheEvict(value = "client", key = "#root.methodName")
-	public void deleteClientById(Long id, Long userId, String userName, Company company) {
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
+	public void deleteClientById(Long id, Long userId, Company company) {
 		ResponseEntity<Client> client = super.getById(id);
 	        if (client == null || company == null) {
 	        	throw new RecordNotFoundException("Client Not Found ");
 	        }
 
             client.getBody().getCompanies().remove(company);
+            client.getBody().setUser(null);;
             clientRepository.save(client.getBody());
 		
 		
 	}
+
+
+	public Optional<Client> getByUserId(Long userId) {
+		Optional<Client> client = clientRepository.findByUserId(userId);
+		return client;
+	}
+
+
+	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
+	public void addMeAsClient(Company company, AppUser user, String code) {
+		Optional<Client> client = clientRepository.findByUserId(user.getId());
+		if(client.isPresent()) {
+			throw new RecordIsAlreadyExist("You Are Already Client");
+		}
+		Optional<Client> client1 = clientRepository.findByCode(code);
+		if(client1.isPresent()) {
+			throw new RecordIsAlreadyExist("This Code is already found Please Try another Code");
+		}
+		Client meClient = new Client();
+		meClient.setCode(code);
+		meClient.setName(company.getName());
+		meClient.setAddress(company.getAddress());
+		meClient.setCredit((double)0);
+		meClient.setEmail(company.getEmail());
+		meClient.setMvt((double)0);
+		meClient.setNature("personne Moral");
+		meClient.setPhone(company.getPhone());
+		Set<Company> companies = new HashSet<>();
+		companies.add(company);
+		meClient.setCompanies(companies);
+		meClient.setUser(user);
+		clientRepository.save(meClient);
+		
+	}
 	
-	
+	private Company getCompany() {
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company != null) {
+			return company;
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
+	}
 	
 
 }

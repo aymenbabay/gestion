@@ -20,6 +20,7 @@ import com.meta.store.base.service.BaseService;
 import com.meta.store.werehouse.dto.FournisseurDto;
 import com.meta.store.werehouse.dto.FournisseurDto2;
 import com.meta.store.werehouse.entity.Fournisseur;
+import com.meta.store.werehouse.entity.Client;
 import com.meta.store.werehouse.entity.Company;
 import com.meta.store.werehouse.mapper.FournisseurMapper;
 import com.meta.store.werehouse.mapper.FournisseurMapper2;
@@ -97,7 +98,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		return null;
 	}
 
-	@Cacheable(value = "fournisseur", key = "#root.methodName")
+	@Cacheable(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
 	public List<FournisseurDto2> getMybyCompanyId(Company company) {
 		List<Fournisseur> fournisseur = fournisseurRepository.getAllByCompanyId(company.getId());
 		if(fournisseur.isEmpty()) {
@@ -179,7 +180,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName")
+	@CacheEvict(value = "fournisseur", key = "#root.methodName", allEntries = true)
 	public FournisseurDto upDateMyFournisseurById(Long id, FournisseurDto fournisseurDto, Company company, Long userId,String username) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 		if(fournisseur == null) {
@@ -193,7 +194,6 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		
 		}
 		if(!fournisseur.getBody().getCreatedBy().equals(username)) {
-			System.out.println(username);
 			throw new NotPermissonException("You Have No Permission");
 		}
 			Optional<Fournisseur> fournisseur1 = fournisseurRepository.findByCode(fournisseurDto.getCode());
@@ -210,7 +210,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName")
+	@CacheEvict(value = "fournisseur", key = "#root.methodName", allEntries = true)
 	public void deleteFournisseurById(Long id, Long userId, String userName, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 	        if (fournisseur == null || company == null) {
@@ -221,6 +221,33 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
             fournisseurRepository.save(fournisseur.getBody());
 		
 		
+	}
+
+
+	public void addMeAsProvider(Company company, AppUser user, String code) {
+		Optional<Fournisseur> provider = fournisseurRepository.findByUserId(user.getId());
+		if(provider.isPresent()) {
+			throw new RecordIsAlreadyExist("You Are Already Provider");
+		}
+		Optional<Fournisseur> fournisseur = fournisseurRepository.findByCode(code);
+		if(fournisseur.isPresent()) {
+			throw new RecordIsAlreadyExist("This {code} is already found Please Try another Code");
+		}
+		
+		Fournisseur meProvider = new Fournisseur();
+		meProvider.setCode(code);
+		meProvider.setName(company.getName());
+		meProvider.setAddress(company.getAddress());
+		meProvider.setCredit((double)0);
+		meProvider.setEmail(company.getEmail());
+		meProvider.setMvt((double)0);
+		meProvider.setNature("personne Moral");
+		meProvider.setPhone(company.getPhone());
+		Set<Company> companies = new HashSet<>();
+		companies.add(company);
+		meProvider.setCompanies(companies);
+		meProvider.setUser(user);
+		fournisseurRepository.save(meProvider);
 	}
 	
 	

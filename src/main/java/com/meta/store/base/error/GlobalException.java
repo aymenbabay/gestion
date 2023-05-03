@@ -25,20 +25,25 @@ public class GlobalException extends ResponseEntityExceptionHandler{
 	public ResponseEntity<?> handleRecordNotFoundException(RecordNotFoundException ex){
 		ErrorResponse error = new ErrorResponse(ex.getLocalizedMessage(), Arrays.asList(ex.getMessage()));
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-		//return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
 	}
 	
 	@ExceptionHandler(RecordIsAlreadyExist.class)
 	public ResponseEntity<?> handleRecordIsAlreadyExistException(RecordIsAlreadyExist ex){
 		ErrorResponse error = new ErrorResponse(ex.getLocalizedMessage(), Arrays.asList(ex.getMessage()));
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
-		//return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
 	}
 	
 	@ExceptionHandler(NotPermissonException.class)
 	public ResponseEntity<?> handleNotPermissonException(NotPermissonException ex){
 		ErrorResponse error = new ErrorResponse(ex.getLocalizedMessage(), Arrays.asList(ex.getMessage()));
 		return ResponseEntity.status(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS).body(error);
+	}
+	
+	@ExceptionHandler(JWTExpired.class)
+	public ResponseEntity<?> handleJWTExpiredException(JWTExpired ex, WebRequest request){
+		ErrorResponse error = new ErrorResponse(ex.getLocalizedMessage(), Arrays.asList(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+
 	}
 	
 	

@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,6 +71,21 @@ public class SousCategoryService  extends BaseService<SousCategory, Long> {
 	
 	public Optional<SousCategory> getByIdAndCompanyId(Long id , Long companyId) {
 		return sousCategoryRepository.findByIdAndCompanyId(id, companyId);
+	}
+
+	public List<SousCategoryDto> getByCompanyIdAndCategoryId(Long id, Long categoryId) {
+
+		List<SousCategory> sousCategory = sousCategoryRepository.findAllByCompanyIdAndCategoryId(id,categoryId);
+		if(sousCategory.isEmpty()) {
+			throw new RecordNotFoundException("there is no sous category inside this category");
+		}
+		List<SousCategoryDto> listSousCategoryDto = new ArrayList<>();
+		for(SousCategory i: sousCategory) {
+			SousCategoryDto sousCategoryDto = sousCategoryMapper.mapToDto(i);
+			listSousCategoryDto.add(sousCategoryDto);
+		}
+		return listSousCategoryDto;
+		
 	}
 	
 }

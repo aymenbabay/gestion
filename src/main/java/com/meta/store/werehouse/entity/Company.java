@@ -3,8 +3,10 @@ package com.meta.store.werehouse.entity;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.security.entity.AppUser;
 
@@ -16,6 +18,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,13 +30,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Company extends BaseEntity<Long>{
 
-	private String companyName;
+	@NotBlank(message = "Company Name Must Be Not Empty")
+	private String name;
 	
 	private String identityNumber;
 	
-	private String National_id_number;
+	private String nationalIdNumber;
 	
 	private String address;
 	
@@ -43,11 +48,15 @@ public class Company extends BaseEntity<Long>{
 	
 	private String logo;
 	
-	private String workForce;
+	private int workForce;
 	
 	private String legalStructure;
 	
 	private String taxStatus;
+	
+	private String phone;
+	
+	private String email;
 	
 	@OneToOne()
 	@JoinColumn(name = "user_id")

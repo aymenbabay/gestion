@@ -12,8 +12,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.meta.store.base.error.JWTExpired;
+
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			 HttpServletResponse response, 
 			 FilterChain filterChain)
 			throws ServletException, IOException {
-		
 		final String authHeader = request.getHeader("Authorization");
 		final String jwt;
 		final String userName;
+		System.out.println(authHeader);
 		if(authHeader == null || !authHeader.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
@@ -59,5 +64,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		 filterChain.doFilter(request, response);
 	}
+	
+
+
+	    @Override
+	    public void destroy() {}
 
 }

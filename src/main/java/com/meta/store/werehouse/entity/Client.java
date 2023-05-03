@@ -1,9 +1,11 @@
 package com.meta.store.werehouse.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.security.entity.AppUser;
 
@@ -31,7 +33,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="client_werehouse")
-public class Client extends BaseEntity<Long> {
+public class Client extends BaseEntity<Long> implements Serializable{
 
 
 	@NotBlank(message = "Client Name Field Must Not Be Empty")

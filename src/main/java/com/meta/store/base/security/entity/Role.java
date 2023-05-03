@@ -1,5 +1,6 @@
 package com.meta.store.base.security.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.meta.store.base.Entity.BaseEntity;
 
 import jakarta.persistence.Entity;

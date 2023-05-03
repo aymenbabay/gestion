@@ -1,6 +1,9 @@
 package com.meta.store.base.AppConfig;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javax.sql.DataSource;
 
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -16,7 +19,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.repository.AppUserRepository;
@@ -25,7 +33,6 @@ import com.meta.store.base.security.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
-@EnableCaching
 @RequiredArgsConstructor
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class WebConfig {
@@ -67,4 +74,9 @@ public class WebConfig {
 			return new BCryptPasswordEncoder();
 		}
 	
+		 
+		
+		  
+	
+
 }

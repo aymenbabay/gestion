@@ -1,12 +1,15 @@
 package com.meta.store.werehouse.dto;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.werehouse.entity.Category;
 import com.meta.store.werehouse.entity.Company;
+import com.meta.store.werehouse.entity.Fournisseur;
 import com.meta.store.werehouse.entity.SousCategory;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
@@ -47,19 +50,18 @@ public class ArticleDto extends BaseDto<Long>  implements Serializable{
 	
 	private String barcode;
 
-	@ManyToOne
-	@JoinColumn(name = "categoryId")
-	private Category category;
+//	@NotBlank(message = "TVA Field Must Not Be Empty")
+	private Double tva;
 	
-	@ManyToOne
-	@JoinColumn(name = "sousCategoryId")
-	private SousCategory sousCategory;
+//	private Category category;
 	
-	@ManyToOne
-	@JoinColumn(name = "companyId")
+//	private SousCategory sousCategory;
+	
 	private Company company;
 
+//	private Fournisseur provider;
 
+	private String image;
 	
 	
 	
