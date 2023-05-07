@@ -55,76 +55,43 @@ private final BaseService<Worker, Long> baseService;
 	
 	@GetMapping("/getbycompany")
 	public ResponseEntity<List<WorkerDto>> getWorkerByCompany(){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		List<Worker> workers = workerService.getAllByCompanyId(companyId);
-		if(!workers.isEmpty()) {
-		List<WorkerDto> workersDto = new ArrayList<>();
-		for(Worker i : workers) {
-			WorkerDto workerDto = workerMapper.mapToDto(i);
-			workersDto.add(workerDto);
-		}
-		return ResponseEntity.ok(workersDto);}
-		throw new RecordNotFoundException("there is no worker");
+		Company company = getCompany();
+		return workerService.getWorkerByCompany(company);
 	}
 	
 	@GetMapping("/l/{name}")
 	public ResponseEntity<WorkerDto> getWorkerById(@PathVariable String name){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
-		ResponseEntity<Worker> worker = workerService.getByNameAndCompanyId(name,company.getId());
-		if(worker != null) {
-		WorkerDto dto = workerMapper.mapToDto(worker.getBody());
-		return ResponseEntity.ok(dto);
-		}
-		
-		else throw new RecordNotFoundException("There Is No Worker With Libelle : "+name);
-		}
-		else throw new RecordNotFoundException("You Have No Company Please Create One :) ");
+		Company company = getCompany();
+		return workerService.getWorkerById(name,company);
 		
 	}
 	
 	@PostMapping("/add")
 	public ResponseEntity<WorkerDto> insertWorker(@RequestBody @Valid WorkerDto workerDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		Long worker1 = workerService.getByName(workerDto.getName());
-		if(worker1 !=null)  {
-			throw new RecordIsAlreadyExist("is already exist");
-		}
-		
-		AppUser user = appUserService.findByUserName(workerDto.getName());
-		Worker worker = new Worker();
-		worker.setName(workerDto.getName());
-		worker.setUser(user);
-		worker.setSalary(workerDto.getSalary());
-		worker.setCompany(company);
-		baseService.insert(worker);
-		return new ResponseEntity<WorkerDto>(HttpStatus.ACCEPTED);
-		
+		Company company = getCompany();
+		return workerService.insertWorker(workerDto,company);
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<WorkerDto> upDateWorker(@RequestBody @Valid WorkerDto workerDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
+		Company company = getCompany();
 		return workerService.upDateWorker(workerDto,company);
-		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public void deleteWorkerById(@PathVariable Long id){
+		Company company = getCompany();
+			workerService.deleteWorkerById(id,company);
+		}
+	
+	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		if(company != null) {
-			Optional<Worker> worker = workerService.getByIdAndCompanyId(id,company.getId());
-			if(worker.isPresent()) {
-		 baseService.deleteById(id,company.getId());
-			}else
-			throw new RecordNotFoundException("This Worker Does Not Exist");
-		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			return company;
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
 	}
 	
 }

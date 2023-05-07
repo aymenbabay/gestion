@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.service.AppUserService;
@@ -33,26 +35,19 @@ public class CategoryService extends BaseService<Category, Long> {
 	private final CategoryRepository categoryRepository;
 	
 	private final ImageService imageService; // i will use it
-
-	private final JwtAuthenticationFilter authenticationFilter;
-	
-	private final AppUserService appUserService;
-	
-	private final CompanyService companyService;
 	
 
 	
 	public ResponseEntity<CategoryDto> upDateCategory( CategoryDto categoryDto, Company company) {
 		Optional<Category> category = categoryRepository.findByIdAndCompanyId(categoryDto.getId(),company.getId());
-		if(category.isPresent()) {
+		if(category.isEmpty()) {
+			throw new RecordNotFoundException("Category Not Found");
+		}
 			Category categ = categoryMapper.mapToEntity(categoryDto);
 			categ.setCompany(company);
 			categoryRepository.save(categ);
 			return ResponseEntity.ok(categoryDto);
 			
-		}else {
-			throw new RecordNotFoundException("Category Not Found");
-		}
 	}
 
 	public Optional<Category> getByLibelle(String libelle, Long companyId) {
@@ -65,11 +60,12 @@ public class CategoryService extends BaseService<Category, Long> {
 
 	public ResponseEntity<Category> getByLibelleAndCompanyId(String name, Long companyId) {
 		Optional<Category> categ = categoryRepository.findByLibelleAndCompanyId(name,companyId);
-		if(!categ.isEmpty()) {
+		if(categ.isEmpty()) {
+			throw new RecordNotFoundException("There is no category with libelle: "+name);
+		}
 		Category category = categ.get();
 		return ResponseEntity.ok(category);
-		}
-		else return null;
+		
 	}
 	
 	public Optional<Category> getByIdAndCompanyId(Long id , Long companyId) {
@@ -77,27 +73,46 @@ public class CategoryService extends BaseService<Category, Long> {
 	}
 	
 
-	private Company getCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
-			return company;
-		}
-			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
-			
-	}
+	
 
-	public ResponseEntity<List<CategoryDto>> getCategoryByCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		List<Category> categorys = getAllByCompanyId(companyId);
-		if(!categorys.isEmpty()) {
+	public List<CategoryDto> getCategoryByCompany(Company company) {
+		List<Category> categorys = getAllByCompanyId(company.getId());
+		if(categorys.isEmpty()) {
+			throw new RecordNotFoundException("there is no category");
+		}
 		List<CategoryDto> categorysDto = new ArrayList<>();
 		for(Category i : categorys) {
 			CategoryDto categoryDto = categoryMapper.mapToDto(i);
 			categorysDto.add(categoryDto);
 		}
-		return ResponseEntity.ok(categorysDto);}
-		throw new RecordNotFoundException("there is no category");
+		return categorysDto;
+	}
+
+	public CategoryDto getByLibelleAndCompanyId(Company company, String name) {
+		Optional<Category> category = categoryRepository.findByLibelleAndCompanyId(name,company.getId());
+		if(category.isEmpty()) {
+			throw new RecordNotFoundException("There Is No Category With Libelle : "+name);
+		}
+		CategoryDto dto = categoryMapper.mapToDto(category.get());
+		return dto;
+	}
+
+	public ResponseEntity<CategoryDto> insertCategory( CategoryDto categoryDto, Company company) {
+		ResponseEntity<Category> category1 = getByLibelleAndCompanyId(categoryDto.getLibelle(),company.getId());
+		if(category1 != null)  {
+			throw new RecordIsAlreadyExist("Category "+categoryDto.getLibelle()+"is already exist");
+		}
+		Category category = categoryMapper.mapToEntity(categoryDto);
+		category.setCompany(company);
+		super.insert(category);
+		return new ResponseEntity<CategoryDto>(HttpStatus.ACCEPTED);
+	}
+
+	public void deleteCategoryById(Long id, Company company) {
+		Optional<Category> category = getByIdAndCompanyId(id,company.getId());
+		if(category.isEmpty()) {
+			throw new RecordNotFoundException("This Category Does Not Exist");
+		}
+		super.deleteById(id,company.getId());		
 	}
 }

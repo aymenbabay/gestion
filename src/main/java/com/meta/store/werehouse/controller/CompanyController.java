@@ -26,7 +26,6 @@ import com.meta.store.werehouse.services.WorkerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Validated
 @RestController
 @RequestMapping("/werehouse/company")
 @RequiredArgsConstructor
@@ -57,6 +56,33 @@ public class CompanyController {
 		return companyService.getMe(company);
 	}
 
+	@GetMapping("/hascompany")
+	public boolean hasCompany() {
+		Company company = getCompany();
+		if(company == null) {
+			Long companyId = workerService.getByName(authenticationFilter.userName);
+			if(companyId != null) {
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	@PostMapping("/add")
+	public ResponseEntity<CompanyDto> insertCompany( 
+			@RequestParam("company") String company,
+			@RequestParam("file") MultipartFile file)throws Exception{
+		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
+		return companyService.insertCompany(company, file, user);
+		}
+	
+	@PutMapping("/update")
+	public ResponseEntity<CompanyDto> upDateCompany(@RequestBody CompanyDto companyDto){
+		return companyService.upDateCompany(companyDto);
+	}
+	
+
 	
 	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
@@ -67,39 +93,6 @@ public class CompanyController {
 		return company;
 	}
 
-	@GetMapping("/has_company")
-	public boolean hasCompany() {
-		System.out.println("11111111111111111111111111111111111111");
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		System.out.println("11111111111111111111111111111111111111"+userId);
-		Company company = companyService.findCompanyIdByUserId(userId);
-		System.out.println("11111111111111111111111111111111111111company");
-		if(company == null) {
-			System.out.println("11111111111111111111111111111111111111companynull");
-			Long companyId = workerService.getByName(authenticationFilter.userName);
-			System.out.println("111111111111111111111111111111111111112check"+companyId);
-			if(companyId != null) {
-				System.out.println("11111111111111111111111111111111111111"+companyId);
-				return true;
-			}
-			return false;
-		}
-		return true;
-	}
-	
-	@PostMapping("/add")
-	public ResponseEntity<CompanyDto> insertCompany( 
-			@RequestParam("company") @Valid String company,
-			@RequestParam("file") MultipartFile file)throws Exception{
-		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
-		return companyService.insertCompany(company, file, user);
-		}
-	
-	@PutMapping("/update")
-	public ResponseEntity<CompanyDto> upDateCompany(@RequestBody @Valid CompanyDto companyDto){
-		return companyService.upDateCompany(companyDto);
-	}
-	
 	//must be do not delete
 	/*
 	@DeleteMapping("/{id}")

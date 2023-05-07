@@ -83,8 +83,8 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 
 
 	@CacheEvict(value = "fournisseur", key = "#root.methodName")
-	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(FournisseurDto2 fournisseurDto, AppUser user, Company company) {
-		Optional<Fournisseur> fournisseur2 = fournisseurRepository.findByUserId(user.getId());
+	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(FournisseurDto2 fournisseurDto, Company company) {
+		Optional<Fournisseur> fournisseur2 = fournisseurRepository.findByUserId(company.getUser().getId());
 		if(fournisseur2.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Fournisseur");
 		}
@@ -93,7 +93,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 			throw new RecordIsAlreadyExist("This Fournisseur Code Is Already Exist");
 		}
 		Fournisseur fournisseur1 = fournisseurMapper2.mapToEntity(fournisseurDto);
-		fournisseur1.setUser(user);
+		fournisseur1.setUser(company.getUser());
 		super.insert(fournisseur1);
 		return null;
 	}
@@ -181,19 +181,19 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 
 
 	@CacheEvict(value = "fournisseur", key = "#root.methodName", allEntries = true)
-	public FournisseurDto upDateMyFournisseurById(Long id, FournisseurDto fournisseurDto, Company company, Long userId,String username) {
+	public FournisseurDto upDateMyFournisseurById(Long id, FournisseurDto fournisseurDto, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 		if(fournisseur == null) {
 			throw new RecordNotFoundException("Fournisseur Not Found");
 		}
 		
 		if( fournisseur.getBody().getUser() != null) {
-			if(fournisseur.getBody().getUser().getId() != userId) {
+			if(fournisseur.getBody().getUser().getId() != company.getUser().getId()) {
 				throw new NotPermissonException("You Have No Permission");
 			}
 		
 		}
-		if(!fournisseur.getBody().getCreatedBy().equals(username)) {
+		if(!fournisseur.getBody().getCreatedBy().equals(company.getUser().getUsername())) {
 			throw new NotPermissonException("You Have No Permission");
 		}
 			Optional<Fournisseur> fournisseur1 = fournisseurRepository.findByCode(fournisseurDto.getCode());
@@ -224,8 +224,8 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	public void addMeAsProvider(Company company, AppUser user, String code) {
-		Optional<Fournisseur> provider = fournisseurRepository.findByUserId(user.getId());
+	public void addMeAsProvider(Company company, String code) {
+		Optional<Fournisseur> provider = fournisseurRepository.findByUserId(company.getUser().getId());
 		if(provider.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Provider");
 		}
@@ -246,7 +246,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		Set<Company> companies = new HashSet<>();
 		companies.add(company);
 		meProvider.setCompanies(companies);
-		meProvider.setUser(user);
+		meProvider.setUser(company.getUser());
 		fournisseurRepository.save(meProvider);
 	}
 	

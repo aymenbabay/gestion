@@ -25,6 +25,7 @@ public class CategoryDto extends BaseDto<Long> implements Serializable {
 	@NotBlank(message = "Libelle Field Must Not Be Empty")
 	private String libelle;
 	
+	private String image;
 	
 	@ManyToOne
 	@JoinColumn(name = "companyId")

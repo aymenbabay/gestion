@@ -51,14 +51,6 @@ public class ArticleService extends BaseService<Article, Long> {
 	private final ImageService imageService;
 
 	
-	private final JwtAuthenticationFilter authenticationFilter;
-	
-	private final AppUserService appUserService;
-	
-	private final CompanyService companyService;
-	
-	private final WorkerService workerService;
-	
 	
 //	public List<Article> getAll(){
 //		return articleRepository.findAll(Sort.by("id").ascending());
@@ -66,12 +58,12 @@ public class ArticleService extends BaseService<Article, Long> {
 	
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ArticleDto> upDateArticle( MultipartFile file, String article) throws JsonMappingException, JsonProcessingException {
-		Company company = getCompany();
+	public ResponseEntity<ArticleDto> upDateArticle( MultipartFile file, String article, Company company, String userName) throws JsonMappingException, JsonProcessingException {
+		
 		ArticleDto articleDto = new ObjectMapper().readValue(article, ArticleDto.class);
 		if(file != null) {
 			
-			String newFileName = imageService.insertImag(file,authenticationFilter.userName, "article");
+			String newFileName = imageService.insertImag(file,userName, "article");
 			articleDto.setImage(newFileName);
 				}
 		Optional<Article> article1 = articleRepository.findByIdAndCompanyId(articleDto.getId(),company.getId());
@@ -99,9 +91,6 @@ public class ArticleService extends BaseService<Article, Long> {
 		
 	}
 
-//	public Optional<Article> getByLibelle(String libelle, Long companyId) {
-//		return articleRepository.findByLibelleAndCompanyId(libelle, companyId);
-//	}
 
 	// i use it in command Line service
 	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")
@@ -114,12 +103,13 @@ public class ArticleService extends BaseService<Article, Long> {
 	}
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ArticleDto> insertArticle( MultipartFile file, String article3) throws JsonMappingException, JsonProcessingException {
-		Company company = getCompany();
+	public ResponseEntity<ArticleDto> insertArticle( MultipartFile file, String article3, Company company, String userName) throws JsonMappingException, JsonProcessingException {
+		System.out.println(article3+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		System.out.println(company.getName()+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		ArticleDto articleDto = new ObjectMapper().readValue(article3, ArticleDto.class);
 		if(file != null) {
 			
-			String newFileName = imageService.insertImag(file,authenticationFilter.userName, "article");
+			String newFileName = imageService.insertImag(file,userName, "article");
 			articleDto.setImage(newFileName);
 				}
 		Optional<Article> article1 = articleRepository.findByLibelleAndCompanyId(articleDto.getLibelle(),company.getId());
@@ -148,8 +138,7 @@ public class ArticleService extends BaseService<Article, Long> {
 	}
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public void addQuantity(Long id, Long quantity) {
-		Long companyId = getCompany().getId();
+	public void addQuantity(Long id, Long quantity, Long companyId) {
 		Optional<Article> article = articleRepository.findByIdAndCompanyId(id,companyId);
 		if(article.isEmpty()) {
 			throw new RecordNotFoundException("there is no article with id: "+id);
@@ -161,8 +150,7 @@ public class ArticleService extends BaseService<Article, Long> {
 	}
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<String> deleteByIdAndCompanyId(Long id) {
-		Long companyId = getCompany().getId();
+	public ResponseEntity<String> deleteByIdAndCompanyId(Long id, Long companyId) {
 		Optional<Article> article = articleRepository.findByIdAndCompanyId(id, companyId);
 			if(article.isEmpty()) {
 				throw new RecordNotFoundException("This Article Does Not Exist");
@@ -172,8 +160,7 @@ public class ArticleService extends BaseService<Article, Long> {
 			return ResponseEntity.ok("successfuly deleted");
 	}
 
-	public List<ArticleDto> getByNameContaining(String articlenamecontaining) {
-		Company company = getCompany();
+	public List<ArticleDto> getByNameContaining(String articlenamecontaining, Company company) {
 		List<Article> article = new ArrayList<>();
 		article = articleRepository.findAllByLibelleAndCompanyIdContaining(articlenamecontaining,company.getId());
 		if(!article.isEmpty()) {
@@ -188,9 +175,7 @@ public class ArticleService extends BaseService<Article, Long> {
 	}
 
 	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")
-	public ResponseEntity<List<ArticleDto>> getArticleByCompany() {
-		System.out.println("get by company service");
-		Company company =  getCompany();
+	public List<ArticleDto> getArticleByCompany(Company company) {
 		List<Article> articles = articleRepository.findAllByCompanyId(company.getId());
 		if(!articles.isEmpty()) {
 		List<ArticleDto> articlesDto = new ArrayList<>();
@@ -199,14 +184,13 @@ public class ArticleService extends BaseService<Article, Long> {
 			ArticleDto articleDto = articleMapper.mapToDto(i);
 			articlesDto.add(articleDto);
 		}
-		return ResponseEntity.ok(articlesDto);
+		return articlesDto;
 		}
 		throw new RecordNotFoundException("there is no article");
 	}
 
 	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")
-	public ResponseEntity<ArticleDto> getArticleById(String name) {
-		Long id = getCompany().getId();
+	public ResponseEntity<ArticleDto> getArticleById(String name, Long id) {
 
 		Optional<Article> article = articleRepository.findByLibelleAndCompanyId(name,id);
 		if(article.isEmpty()) {
@@ -215,20 +199,21 @@ public class ArticleService extends BaseService<Article, Long> {
 		ArticleDto dto = articleMapper.mapToDto(article.get());
 		return ResponseEntity.ok(dto);
 	}
-	
-	private Company getCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
-			return company;
+
+
+	public List<ArticleDto> getdgdgeg() {
+		List<Article> article = articleRepository.findRandomArticles();
+		if(article== null) {
+			throw new RecordNotFoundException("No Article");
 		}
-		Long companyId = workerService.getCompanyIdByUserName(authenticationFilter.userName);
-		if(companyId != null) {			
-		ResponseEntity<Company> company2 = companyService.getById(companyId);
-		return company2.getBody();
-		}
-			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
-			
+			List<ArticleDto> articlesDto = new ArrayList<>();
+			for(Article i:article) {
+			ArticleDto dto = articleMapper.mapToDto(i);
+			articlesDto.add(dto);
 	}
+			return articlesDto;
+	}
+	
+	
 	
 }

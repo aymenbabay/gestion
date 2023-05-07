@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,8 +31,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company")
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Company extends BaseEntity<Long>{
+//@JsonIgnoreProperties(ignoreUnknown = true)
+public class Company extends BaseEntity<Long> implements Serializable{
 
 	@NotBlank(message = "Company Name Must Be Not Empty")
 	private String name;

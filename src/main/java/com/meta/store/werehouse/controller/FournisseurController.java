@@ -45,72 +45,44 @@ public class FournisseurController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<FournisseurDto> insertFournisseur(@RequestBody  FournisseurDto fournisseurDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return fournisseurService.insertFournisseur(fournisseurDto, company);
 	}
 	
 	@GetMapping("/add_exist/{id}")
 	public ResponseEntity<String> addExistFournisseur(@PathVariable Long id){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return fournisseurService.addExistFournisseur(id,company);
 	}
 	
 	@PostMapping("/add_me_exist")
 	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(@RequestBody FournisseurDto2 fournisseurDto){
-		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
-		Company company = companyService.findCompanyIdByUserId(user.getId());
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		return fournisseurService.addMeAsFournisseur(fournisseurDto,user,company);
+		Company company = getCompany();
+		return fournisseurService.addMeAsFournisseur(fournisseurDto,company);
 	}
 	
 	@GetMapping("/add_me/{code}")
 	public void addMeAsProvider(@PathVariable String code) {
-		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
-		Company company = companyService.findCompanyIdByUserId(user.getId());
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		fournisseurService.addMeAsProvider(company, user, code);
+		Company company = getCompany();
+		fournisseurService.addMeAsProvider(company, code);
 		
 	}
 	
 	@GetMapping("/get_all_my")
 	public List<FournisseurDto2> getMybyCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return fournisseurService.getMybyCompanyId(company);
 	}
 	
 	@GetMapping("/get_my_by_code/{code}")
 	public FournisseurDto getMyByCode(@PathVariable @Valid String code) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return fournisseurService.getMyByCodeAndCompanyId(code,company);
 	}
 
 	@GetMapping("/get_my_by_name/{name}")
 	public List<FournisseurDto> getMyByName(@PathVariable @Valid String name) {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
+		Company company = getCompany();
 		return fournisseurService.getMyByNameAndCompanyId(name,company);
 	}
 	
@@ -135,23 +107,25 @@ public class FournisseurController {
 	@PutMapping("/update/{id}")
 	public FournisseurDto upDateMyFournisseurById(@PathVariable Long id, @RequestBody FournisseurDto fournisseurDto) {
 		System.out.println("haw fi update provider"+fournisseurDto.getId());
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
-		}
-		return fournisseurService.upDateMyFournisseurById(id,fournisseurDto,company,userId,authenticationFilter.userName);
+		Company company = getCompany();
+		return fournisseurService.upDateMyFournisseurById(id,fournisseurDto,company);
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public void deleteFournisseur(@PathVariable Long id) {
+		Company company = getCompany();
+		fournisseurService.deleteFournisseurById(id,company.getUser().getId(),authenticationFilter.userName,company);
+		
+	}
+	
+	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company == null) {
-			throw new RecordNotFoundException("You Do Not Have A Company");
+		if(company != null) {
+			return company;
 		}
-		fournisseurService.deleteFournisseurById(id,userId,authenticationFilter.userName,company);
-		
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
 	}
 
 }

@@ -33,6 +33,12 @@ public interface ArticleRepository extends BaseRepository<Article,Long> {
 
 	void deleteByIdAndCompanyId(Long id, Long companyId);
 
+//	@Query(value = "SELECT * FROM article WHERE company_id = (SELECT id FROM company ORDER BY RAND() LIMIT 1) ORDER BY RAND() LIMIT 1", nativeQuery = true)
+//	Optional<Article> findRandomArticleByRandomCompany();
+	@Query(value = "SELECT a FROM Article a JOIN FETCH a.company c ORDER BY random() LIMIT 10")
+    List<Article> findRandomArticles();
+
+
 
 
 }

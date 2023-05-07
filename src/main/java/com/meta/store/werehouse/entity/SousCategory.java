@@ -30,6 +30,7 @@ public class SousCategory extends BaseEntity<Long> {
 	@NotBlank(message = "Libelle Field Must Not Be Empty")	
 	private String libelle;
 	
+	private String image;
 	
 	@ManyToOne
 	@JoinColumn(name = "categoryId")

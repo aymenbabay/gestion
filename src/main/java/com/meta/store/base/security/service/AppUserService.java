@@ -74,7 +74,7 @@ public class AppUserService  {
 		return ResponseEntity.ok(appUserRepository.save(user));
 	}
 
-	@Cacheable(value = "user", key = "#root.methodName")
+	@Cacheable(value = "user", key = "#root.methodName + '_'+ #name")
 	public AppUser findByUserName(String name) {
 		return appUserRepository.findByUserName(name).orElse(null);
 	}

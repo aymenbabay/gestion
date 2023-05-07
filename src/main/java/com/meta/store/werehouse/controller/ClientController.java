@@ -61,16 +61,14 @@ public class ClientController {
 	
 	@PostMapping("/add_me_exist")
 	public ResponseEntity<ClientDto2> addMeAsClientExist(@RequestBody ClientDto2 clientDto){
-		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
 		Company company = getCompany();
-		return clientService.addMeAsClientExist(clientDto,user,company);
+		return clientService.addMeAsClientExist(clientDto,company);
 	}
 	
 	@GetMapping("/add_me/{code}")
 	public void addMeAsClient(@PathVariable String code) {
 		Company company = getCompany();
-		AppUser user = appUserService.findByUserName(authenticationFilter.userName);
-		clientService.addMeAsClient(company, user, code);
+		clientService.addMeAsClient(company, code);
 		
 	}
 	

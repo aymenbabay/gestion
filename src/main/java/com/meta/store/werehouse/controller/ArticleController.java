@@ -48,27 +48,42 @@ public class ArticleController {
 
 	
 	private final ArticleService articleService;
+
+	private final JwtAuthenticationFilter authenticationFilter;
 	
+	private final AppUserService appUserService;
+	
+	private final CompanyService companyService;
+	
+	private final WorkerService workerService;
 	
 	@GetMapping("/{articlenamecontaining}")
 	public List<ArticleDto> getByNameContaining(@PathVariable String articlenamecontaining ){
-		return articleService.getByNameContaining(articlenamecontaining);
+		Company company = getCompany();
+		return articleService.getByNameContaining(articlenamecontaining,company);
 	}
 	
 	@GetMapping("/{id}/{quantity}")
 	public void addQuantity(@PathVariable Long quantity, @PathVariable Long id) {
-		articleService.addQuantity(id,quantity);
+		Long companyId = getCompany().getId();
+		articleService.addQuantity(id,quantity,companyId);
 	}
 	
-	@GetMapping("/getbycompany")
-	public ResponseEntity<List<ArticleDto>> getArticleByCompany(){
-		System.out.println("get by company");
-		return articleService.getArticleByCompany();
+	@GetMapping("/getbycompany/{id}")
+	public List<ArticleDto> getArticleByCompany(@PathVariable Long id){
+		System.out.println(id);
+		if(id !=0) {
+			ResponseEntity<Company> company = companyService.getById(id);
+			return articleService.getArticleByCompany(company.getBody());
+		}
+		Company company = getCompany();
+		return articleService.getArticleByCompany(company);
 	}
 	
 	@GetMapping("/l/{name}")
 	public ResponseEntity<ArticleDto> getArticleById(@PathVariable String name){
-		return articleService.getArticleById(name);
+		Long companyId = getCompany().getId();
+		return articleService.getArticleById(name,companyId);
 	}
 	
 	@PostMapping("/add")
@@ -76,19 +91,41 @@ public class ArticleController {
 			 @RequestParam(value ="file", required = false) MultipartFile file,
 			 @RequestParam("article") String article)
 			throws Exception{
-		return articleService.insertArticle(file,article);
+		Company company = getCompany();
+		return articleService.insertArticle(file,article,company, authenticationFilter.userName);
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<ArticleDto> upDateArticle(
 			 @RequestParam(value ="file", required = false) MultipartFile file,
 			 @RequestParam("article") String article) throws Exception{
-		return articleService.upDateArticle(file,article);
+		Company company = getCompany();
+		return articleService.upDateArticle(file,article, company, authenticationFilter.userName);
 	}
 	
 	@DeleteMapping("delete/{id}")
 	public ResponseEntity<String> deleteArticleById(@PathVariable Long id){
-		return articleService.deleteByIdAndCompanyId(id);
+		Long companyId = getCompany().getId();
+		return articleService.deleteByIdAndCompanyId(id,companyId);
+	}
+	
+	@GetMapping("/getrandom")
+	public List<ArticleDto> getaertt(){
+		return articleService.getdgdgeg();
+	}
+	private Company getCompany() {
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company != null) {
+			return company;
+		}
+		Long companyId = workerService.getCompanyIdByUserName(authenticationFilter.userName);
+		if(companyId != null) {			
+		ResponseEntity<Company> company2 = companyService.getById(companyId);
+		return company2.getBody();
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
 	}
 	
 	

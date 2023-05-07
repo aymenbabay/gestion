@@ -97,8 +97,8 @@ public class ClientService extends BaseService<Client, Long> {
 
 
 	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ClientDto2> addMeAsClientExist(ClientDto2 clientDto, AppUser user, Company company) {
-		Optional<Client> client2 = clientRepository.findByUserId(user.getId());
+	public ResponseEntity<ClientDto2> addMeAsClientExist(ClientDto2 clientDto, Company company) {
+		Optional<Client> client2 = clientRepository.findByUserId(company.getUser().getId());
 		if(client2.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Client");
 		}
@@ -107,7 +107,7 @@ public class ClientService extends BaseService<Client, Long> {
 			throw new RecordIsAlreadyExist("This Client Code Is Already Exist");
 		}
 		Client client1 = clientMapper2.mapToEntity(clientDto);
-		client1.setUser(user);
+		client1.setUser(company.getUser());
 		super.insert(client1);
 		return null;
 	}
@@ -250,8 +250,8 @@ public class ClientService extends BaseService<Client, Long> {
 
 
 	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public void addMeAsClient(Company company, AppUser user, String code) {
-		Optional<Client> client = clientRepository.findByUserId(user.getId());
+	public void addMeAsClient(Company company, String code) {
+		Optional<Client> client = clientRepository.findByUserId(company.getUser().getId());
 		if(client.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Client");
 		}
@@ -271,7 +271,7 @@ public class ClientService extends BaseService<Client, Long> {
 		Set<Company> companies = new HashSet<>();
 		companies.add(company);
 		meClient.setCompanies(companies);
-		meClient.setUser(user);
+		meClient.setUser(company.getUser());
 		clientRepository.save(meClient);
 		
 	}

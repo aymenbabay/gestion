@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.service.AppUserService;
+import com.meta.store.werehouse.dto.ClientDto;
 import com.meta.store.werehouse.dto.InvoiceDto;
 import com.meta.store.werehouse.entity.Client;
 import com.meta.store.werehouse.entity.Company;
@@ -46,33 +47,30 @@ public class InvoiceController {
 	
 	@GetMapping("/code/{code}")
 	public ResponseEntity<List<InvoiceDto>> getInvoiceByCode(@PathVariable Long code){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		return invoiceService.getByCodeAndCompanyId(code, company.getId(), userId);
+		Company company = getCompany();
+		return invoiceService.getByCodeAndCompanyId(code, company.getId(), company.getUser().getId());
 				
 	}
 	
+	//cause it's use in client service
 	@PostMapping("/add")
 	public ResponseEntity<InvoiceDto> insertInvoice(@RequestBody @Valid Client client){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
+		Company company = getCompany();
 		return invoiceService.insertInvoice(client,company);
 	}
 	
 	
 	@GetMapping("/getbycompany")
 	public ResponseEntity<List<Long>> getInvoiceByCompany(){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		return invoiceService.getAllByCompanyId(companyId,userId);
+		Company company = getCompany();
+		return invoiceService.getAllByCompanyId(company.getId(),company.getUser().getId());
 		
 	}
 
 	@GetMapping("/getMyByCompany")
 	public List<InvoiceDto> getMyByCompany(){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		return invoiceService.getMyByCompany(companyId,userId);
+		Company company = getCompany();
+		return invoiceService.getMyByCompany(company.getId(),company.getUser().getId());
 	}
 	
 	@GetMapping("/getAsClient")
@@ -82,29 +80,31 @@ public class InvoiceController {
 	}
 	@GetMapping("/getlastinvoice")
 	public InvoiceDto getLastInvoice() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Long companyId = companyService.findCompanyIdByUserId(userId).getId();
-		if(companyId == null) {
-			throw new RecordNotFoundException("you have no company");
-		}
-		return invoiceService.getLastInvoice(companyId);
+		Company company = getCompany();
+		return invoiceService.getLastInvoice(company.getId());
 		
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<InvoiceDto> upDateInvoice(@RequestBody @Valid InvoiceDto invoiceDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
+		Company company = getCompany();
 		return invoiceService.upDateInvoice(invoiceDto, company);
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public void deleteInvoiceById(@PathVariable Long id){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
+		Company company = getCompany();
 		 invoiceService.deleteInvoiceById(id,company);
 	}
 	
-	
+	private Company getCompany() {
+
+		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
+		Company company = companyService.findCompanyIdByUserId(userId);
+		if(company == null) {
+			throw new RecordNotFoundException("you do not have a company");
+		}
+		return company;
+	}
 	
 }

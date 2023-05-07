@@ -42,9 +42,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryController {
 
-	private final BaseService<Category, Long> baseService;
-	
-	private final CategoryMapper categoryMapper;
 	
 	private final CategoryService categoryService;
 	
@@ -56,64 +53,44 @@ public class CategoryController {
 	
 
 	@GetMapping("/getbycompany")
-	public ResponseEntity<List<CategoryDto>> getCategoryByCompany(){
-		
-		return categoryService.getCategoryByCompany();
+	public List<CategoryDto> getCategoryByCompany(){
+		Company company = getCompany();
+		return categoryService.getCategoryByCompany(company);
 	}
 	
 	@GetMapping("/l/{name}")
-	public ResponseEntity<CategoryDto> getCategoryById(@PathVariable String name){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
-		ResponseEntity<Category> category = categoryService.getByLibelleAndCompanyId(name,company.getId());
-		if(category != null) {
-		CategoryDto dto = categoryMapper.mapToDto(category.getBody());
-		return ResponseEntity.ok(dto);
-		}
-		
-		else throw new RecordNotFoundException("There Is No Category With Libelle : "+name);
-		}
-		else throw new RecordNotFoundException("You Have No Company Please Create One :) ");
-		
+	public CategoryDto getCategoryById(@PathVariable String name){
+		Company company = getCompany();
+	return categoryService.getByLibelleAndCompanyId(company, name)	;
+
 	}
 	
-	@PostMapping("/add")
+	@PostMapping("/add")//file
 	public ResponseEntity<CategoryDto> insertCategory(@RequestBody @Valid CategoryDto categoryDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		ResponseEntity<Category> category1 = categoryService.getByLibelleAndCompanyId(categoryDto.getLibelle(),company.getId());
-		if(category1 == null)  {
-		Category category = categoryMapper.mapToEntity(categoryDto);
-		category.setCompany(company);
-		baseService.insert(category);
-		return new ResponseEntity<CategoryDto>(HttpStatus.ACCEPTED);
-		}else {
-			throw new RecordIsAlreadyExist("is already exist");
-		}
+		Company company = getCompany();
+		return categoryService.insertCategory(categoryDto,company);
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<CategoryDto> upDateCategory(@RequestBody @Valid CategoryDto categoryDto){
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
+		Company company = getCompany();
 		return categoryService.upDateCategory(categoryDto,company);
-		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
 	}
+	
 	
 	@DeleteMapping("/delete/{id}")
 	public void deleteCategoryById(@PathVariable Long id){
+		Company company = getCompany();
+		categoryService.deleteCategoryById(id,company);
+	}
+	
+	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		if(company != null) {
-			Optional<Category> category = categoryService.getByIdAndCompanyId(id,company.getId());
-			if(category.isPresent()) {
-		 baseService.deleteById(id,company.getId());
-			}else
-			throw new RecordNotFoundException("This Category Does Not Exist");
-		}else throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			return company;
+		}
+			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
+			
 	}
-	
-	
 }

@@ -25,6 +25,7 @@ public class SousCategoryDto extends BaseDto<Long> implements Serializable {
 	@NotBlank(message = "Libelle Field Must Not Be Empty")	
 	private String libelle;
 	
+	private String image;
 	
 	private Category category;
 	

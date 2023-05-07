@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -172,7 +173,6 @@ public class InvoiceService extends BaseService<Invoice, Long>  {
 		}
 		return dtos;
 	}
-
 
 
 	public InvoiceDto getLastInvoice(Long companyId) {

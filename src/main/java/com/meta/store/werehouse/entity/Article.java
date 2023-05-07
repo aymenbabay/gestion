@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,14 +32,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="article_werehouse")
-public class Article extends BaseEntity<Long> {
+public class Article extends BaseEntity<Long> implements Serializable{
 
 	
 	@NotBlank(message = "Libelle Field Must Not Be Empty")
 	private String libelle;
 	
 	@NotBlank(message = "Code Field Must Not Be Empty")
-	@Column(unique = true)
+	@Column(unique = false)
 	private String code;
 
 	private String unit;
