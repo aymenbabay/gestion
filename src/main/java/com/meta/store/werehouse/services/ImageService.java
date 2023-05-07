@@ -46,9 +46,13 @@ public class ImageService {
 		return newFileName;
 	}
 
-	public byte[] getImage( String logo, String service) throws IOException {
-		
+	public byte[] getImage( String logo, String service, String name) throws IOException {
+		if(name =="") {	
+			System.out.println(name+"11111111");
 		return Files.readAllBytes(Paths.get(context.getRealPath("/Images/"+service+"/"+authenticationFilter.userName+"/"+logo)));
-
+		}
+		System.out.println(name);
+		return Files.readAllBytes(Paths.get(context.getRealPath("/Images/"+service+"/"+name+"/"+logo)));
+		
 	}
 }

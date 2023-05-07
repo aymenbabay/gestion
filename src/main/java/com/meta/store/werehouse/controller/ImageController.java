@@ -22,8 +22,9 @@ public class ImageController {
 	private final ImageService imageService;
 
 	
-	@GetMapping(path = "/{lien}/{service}")
-	public byte[] getImage( @PathVariable String lien, @PathVariable String service)throws Exception {
-		return imageService.getImage( lien,service);
+	@GetMapping(path = "/{lien}/{service}/{name}")
+	public byte[] getImage( @PathVariable String lien, @PathVariable String service, @PathVariable String name)throws Exception {
+		System.out.println(name+" udvkjh");
+		return imageService.getImage( lien,service,name);
 				}
 }
