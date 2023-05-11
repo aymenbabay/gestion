@@ -71,15 +71,15 @@ public class SousCategoryController {
 	}
 	
 	@PostMapping("/add")
-	public ResponseEntity<SousCategoryDto> insertSousCategory(@RequestParam("souscategory") SousCategoryDto sousCategoryDto,
-			@RequestParam(value = "file",required=false) MultipartFile file){
+	public ResponseEntity<SousCategoryDto> insertSousCategory(@RequestParam("sousCategory") String sousCategoryDto,
+			@RequestParam(value = "file",required=false) MultipartFile file) throws JsonMappingException, JsonProcessingException{
 		Company company = getCompany();
 		return sousCategoryService.insertSousCategory(sousCategoryDto,company,file);
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<SousCategoryDto> upDateSousCategory(
-			@RequestParam("souscategory") String sousCategoryDto,
+			@RequestParam("sousCategory") String sousCategoryDto,
 			@RequestParam(value="file",required=false) MultipartFile file) throws JsonMappingException, JsonProcessingException{
 		Company company = getCompany();
 		return sousCategoryService.upDateSousCategory(sousCategoryDto,company,file);

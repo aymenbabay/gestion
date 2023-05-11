@@ -71,12 +71,12 @@ public class ArticleController {
 	
 	@GetMapping("/getbycompany/{id}")
 	public List<ArticleDto> getArticleByCompany(@PathVariable Long id){
-		System.out.println(id);
 		if(id !=0) {
 			ResponseEntity<Company> company = companyService.getById(id);
 			return articleService.getArticleByCompany(company.getBody());
 		}
 		Company company = getCompany();
+		System.out.println(id+"ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc");
 		return articleService.getArticleByCompany(company);
 	}
 	
@@ -92,7 +92,7 @@ public class ArticleController {
 			 @RequestParam("article") String article)
 			throws Exception{
 		Company company = getCompany();
-		return articleService.insertArticle(file,article,company, authenticationFilter.userName);
+		return articleService.insertArticle(file,article,company);
 	}
 	
 	@PutMapping("/update")
@@ -100,7 +100,7 @@ public class ArticleController {
 			 @RequestParam(value ="file", required = false) MultipartFile file,
 			 @RequestParam("article") String article) throws Exception{
 		Company company = getCompany();
-		return articleService.upDateArticle(file,article, company, authenticationFilter.userName);
+		return articleService.upDateArticle(file,article, company);
 	}
 	
 	@DeleteMapping("delete/{id}")
@@ -113,6 +113,7 @@ public class ArticleController {
 	public List<ArticleDto> getaertt(){
 		return articleService.getdgdgeg();
 	}
+	
 	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);

@@ -25,14 +25,16 @@ public class Worker extends BaseEntity<Long> {
 	
 	//@UniqueElements(message = "Worker Name Must Be Unique")
 	private String name;
-	
-//	private String phone;
-//	
-//	private String email;
-//	
-//	private String address;
-	
+		
 	private Double salary;
+	
+	private String jobtitle;
+	
+	private String department;
+	
+	private long totdayvacation;
+
+	private boolean statusvacation;
 	
 	@OneToOne
 	@JoinColumn(name = "user_id",referencedColumnName = "id")

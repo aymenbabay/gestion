@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.meta.store.base.Entity.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -32,7 +33,7 @@ public class SousCategory extends BaseEntity<Long> {
 	
 	private String image;
 	
-	@ManyToOne
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "categoryId")
 	private Category category;
 	

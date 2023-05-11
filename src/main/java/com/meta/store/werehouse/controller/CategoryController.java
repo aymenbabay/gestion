@@ -16,8 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
@@ -66,15 +70,21 @@ public class CategoryController {
 	}
 	
 	@PostMapping("/add")//file
-	public ResponseEntity<CategoryDto> insertCategory(@RequestBody @Valid CategoryDto categoryDto){
+	public ResponseEntity<CategoryDto> insertCategory(
+			@RequestParam("categoryDto") String categoryDto, 
+			@RequestParam(value="file",required=false) MultipartFile file) throws JsonMappingException, JsonProcessingException
+	{
+		System.out.println("insert");
 		Company company = getCompany();
-		return categoryService.insertCategory(categoryDto,company);
+		return categoryService.insertCategory(categoryDto,company,file);
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<CategoryDto> upDateCategory(@RequestBody @Valid CategoryDto categoryDto){
+	public ResponseEntity<CategoryDto> upDateCategory(
+			@RequestParam String categoryDto,
+			@RequestParam(value="file", required=false) MultipartFile file) throws JsonMappingException, JsonProcessingException{
 		Company company = getCompany();
-		return categoryService.upDateCategory(categoryDto,company);
+		return categoryService.upDateCategory(categoryDto,company,file);
 	}
 	
 	

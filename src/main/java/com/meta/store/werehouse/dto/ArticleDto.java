@@ -53,13 +53,13 @@ public class ArticleDto extends BaseDto<Long>  implements Serializable{
 //	@NotBlank(message = "TVA Field Must Not Be Empty")
 	private Double tva;
 	
-//	private Category category;
+	private Category category;
 	
-//	private SousCategory sousCategory;
+	private SousCategory sousCategory;
 	
 	private Company company;
 
-//	private Fournisseur provider;
+	private Fournisseur provider;
 
 	private String image;
 	

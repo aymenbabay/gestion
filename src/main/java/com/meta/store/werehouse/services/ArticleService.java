@@ -58,12 +58,12 @@ public class ArticleService extends BaseService<Article, Long> {
 	
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ArticleDto> upDateArticle( MultipartFile file, String article, Company company, String userName) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<ArticleDto> upDateArticle( MultipartFile file, String article, Company company) throws JsonMappingException, JsonProcessingException {
 		
 		ArticleDto articleDto = new ObjectMapper().readValue(article, ArticleDto.class);
 		if(file != null) {
 			
-			String newFileName = imageService.insertImag(file,userName, "article");
+			String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "article");
 			articleDto.setImage(newFileName);
 				}
 		Optional<Article> article1 = articleRepository.findByIdAndCompanyId(articleDto.getId(),company.getId());
@@ -93,9 +93,9 @@ public class ArticleService extends BaseService<Article, Long> {
 
 
 	// i use it in command Line service
-	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")
-	public Article findByCodeAndCompanyId(String code_article, Long companyId) {
-		Optional<Article> article = articleRepository.findByCodeAndCompanyId(code_article,companyId);
+	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id + '_' + #code_article")
+	public Article findByCodeAndCompanyId(String code_article, Company company) {
+		Optional<Article> article = articleRepository.findByCodeAndCompanyId(code_article,company.getId());
 		if(article.isEmpty()) {
 			throw new RecordNotFoundException("Article with code: "+code_article+" Not Found");
 		}
@@ -103,13 +103,11 @@ public class ArticleService extends BaseService<Article, Long> {
 	}
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ArticleDto> insertArticle( MultipartFile file, String article3, Company company, String userName) throws JsonMappingException, JsonProcessingException {
-		System.out.println(article3+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		System.out.println(company.getName()+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	public ResponseEntity<ArticleDto> insertArticle( MultipartFile file, String article3, Company company) throws JsonMappingException, JsonProcessingException {
 		ArticleDto articleDto = new ObjectMapper().readValue(article3, ArticleDto.class);
 		if(file != null) {
 			
-			String newFileName = imageService.insertImag(file,userName, "article");
+			String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "article");
 			articleDto.setImage(newFileName);
 				}
 		Optional<Article> article1 = articleRepository.findByLibelleAndCompanyId(articleDto.getLibelle(),company.getId());
@@ -176,17 +174,18 @@ public class ArticleService extends BaseService<Article, Long> {
 
 	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")
 	public List<ArticleDto> getArticleByCompany(Company company) {
+		System.out.println("article service 1aaaaaaaaaaaaaaaaaaaaaaaaaa");
 		List<Article> articles = articleRepository.findAllByCompanyId(company.getId());
-		if(!articles.isEmpty()) {
+		if(articles.isEmpty()) {
+			throw new RecordNotFoundException("there is no article");
+		}
 		List<ArticleDto> articlesDto = new ArrayList<>();
+		System.out.println("article service 222222222222222222222222222222222222222222222");
 		for(Article i : articles) {
-			System.out.println(i.getCode());
 			ArticleDto articleDto = articleMapper.mapToDto(i);
 			articlesDto.add(articleDto);
 		}
 		return articlesDto;
-		}
-		throw new RecordNotFoundException("there is no article");
 	}
 
 	@Cacheable(value = "article", key = "#root.methodName + '_' + #company.id")

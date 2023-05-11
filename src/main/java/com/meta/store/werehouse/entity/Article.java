@@ -66,15 +66,15 @@ public class Article extends BaseEntity<Long> implements Serializable{
 //	@NotNull(message = "يهديك مش فارغ")it's accept "" but @NotEmpty can't accept it and @NotBlank dosn't accept "" or null
 //	private String name;
 	
-	@ManyToOne
-	@JoinColumn(nullable = true,name = "categoryId")
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "categoryId")
 	private Category category;
 	
-	@ManyToOne()
-	@JoinColumn(nullable = true,name = "sousCategoryId")
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "sousCategoryId")
 	private SousCategory sousCategory;
 	
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "companyId")
 	private Company company;
 	

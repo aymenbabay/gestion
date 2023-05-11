@@ -47,9 +47,11 @@ public class CommandLineService extends BaseService<CommandLine, Long>{
 		List<Article> articles = new ArrayList<>();
 		InvoiceDto invoiceDto = invoiceService.getLastInvoice(company.getId());
 		Invoice invoice = invoiceMapper.mapToEntity(invoiceDto);
-
+		System.out.println("command lineeeeeeeeeeeeeeeeeeeeeeeeeeeee service"+commandLinesDto.get(0).getCodeArticle()+"//////////"+commandLinesDto.get(1).getCodeArticle());
+		
 		for(CommandLineDto i : commandLinesDto) {
-			Article article = articleService.findByCodeAndCompanyId(i.getCodeArticle(),company.getId());
+			Article article = articleService.findByCodeAndCompanyId(i.getCodeArticle(),company);
+			System.out.println(article.getCode()+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 			articles.add(article);
 			if(article.getQuantity()-i.getQuantity()<0) {
 				throw new RecordNotFoundException("There Is No More "+i.getLibelleArticle());

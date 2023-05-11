@@ -7,7 +7,11 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
@@ -38,12 +42,18 @@ public class CategoryService extends BaseService<Category, Long> {
 	
 
 	
-	public ResponseEntity<CategoryDto> upDateCategory( CategoryDto categoryDto, Company company) {
+	public ResponseEntity<CategoryDto> upDateCategory( String catDto, Company company, MultipartFile file) throws JsonMappingException, JsonProcessingException {
+		CategoryDto categoryDto = new ObjectMapper().readValue(catDto, CategoryDto.class);
 		Optional<Category> category = categoryRepository.findByIdAndCompanyId(categoryDto.getId(),company.getId());
 		if(category.isEmpty()) {
 			throw new RecordNotFoundException("Category Not Found");
 		}
 			Category categ = categoryMapper.mapToEntity(categoryDto);
+			if(file != null) {
+
+				String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "category");
+				categ.setImage(newFileName);
+			}
 			categ.setCompany(company);
 			categoryRepository.save(categ);
 			return ResponseEntity.ok(categoryDto);
@@ -58,15 +68,7 @@ public class CategoryService extends BaseService<Category, Long> {
 		return categoryRepository.findAllByCompanyId(companyId);
 	}
 
-	public ResponseEntity<Category> getByLibelleAndCompanyId(String name, Long companyId) {
-		Optional<Category> categ = categoryRepository.findByLibelleAndCompanyId(name,companyId);
-		if(categ.isEmpty()) {
-			throw new RecordNotFoundException("There is no category with libelle: "+name);
-		}
-		Category category = categ.get();
-		return ResponseEntity.ok(category);
-		
-	}
+
 	
 	public Optional<Category> getByIdAndCompanyId(Long id , Long companyId) {
 		return categoryRepository.findByIdAndCompanyId(id, companyId);
@@ -97,12 +99,21 @@ public class CategoryService extends BaseService<Category, Long> {
 		return dto;
 	}
 
-	public ResponseEntity<CategoryDto> insertCategory( CategoryDto categoryDto, Company company) {
-		ResponseEntity<Category> category1 = getByLibelleAndCompanyId(categoryDto.getLibelle(),company.getId());
-		if(category1 != null)  {
+	public ResponseEntity<CategoryDto> insertCategory( String catDto, Company company, MultipartFile file)
+			throws JsonMappingException, JsonProcessingException {
+
+		System.out.println("insert service"+catDto);
+		CategoryDto categoryDto = new ObjectMapper().readValue(catDto, CategoryDto.class);
+		Optional<Category> category1 = categoryRepository.findByLibelleAndCompanyId(categoryDto.getLibelle(),company.getId());
+		if(category1.isPresent())  {
 			throw new RecordIsAlreadyExist("Category "+categoryDto.getLibelle()+"is already exist");
 		}
 		Category category = categoryMapper.mapToEntity(categoryDto);
+		if(file !=null) {
+
+			String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "category");
+			category.setImage(newFileName);
+		}
 		category.setCompany(company);
 		super.insert(category);
 		return new ResponseEntity<CategoryDto>(HttpStatus.ACCEPTED);

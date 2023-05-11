@@ -58,7 +58,7 @@ public class SousCategoryService  extends BaseService<SousCategory, Long> {
 			}
 			if(file != null) {
 
-				String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "category");
+				String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "souscategory");
 				categ.setImage(newFileName);
 			}
 			categ.setCompany(company);
@@ -138,15 +138,18 @@ public class SousCategoryService  extends BaseService<SousCategory, Long> {
 		return sousCategoryDto;
 	}
 
-	public ResponseEntity<SousCategoryDto> insertSousCategory(SousCategoryDto sousCategoryDto, Company company, MultipartFile file){
+	public ResponseEntity<SousCategoryDto> insertSousCategory(String sousCatDto, Company company, MultipartFile file) throws JsonMappingException, JsonProcessingException{
+		System.out.println(sousCatDto+"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+		SousCategoryDto sousCategoryDto = new ObjectMapper().readValue(sousCatDto, SousCategoryDto.class);
 		ResponseEntity<SousCategory> sousCategory1 = getByLibelleAndCompanyId(sousCategoryDto.getLibelle(),company.getId());
 	if(sousCategory1 != null)  {
 		throw new RecordIsAlreadyExist("is already exist");
 	}
+	
 	SousCategory sousCategory = sousCategoryMapper.mapToEntity(sousCategoryDto);
 	if(file != null) {
 
-		String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "category");
+		String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "souscategory");
 		sousCategory.setImage(newFileName);
 	}
 	sousCategory.setCompany(company);

@@ -53,8 +53,8 @@ public class CommandLineController {
 
 	
 	@PostMapping("/{type}/{code}/{id}")
-	public ResponseEntity<InputStreamResource> addCommandLine(@RequestBody @Valid List<CommandLineDto> commandLinesDto, @PathVariable Long code, @PathVariable String type, @PathVariable Long id) {
-
+	public ResponseEntity<InputStreamResource> addCommandLine(@RequestBody @Valid List<CommandLineDto> commandLinesDto,
+			@PathVariable Long code, @PathVariable String type, @PathVariable Long id) {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		commandLineService.insertLine(commandLinesDto, company);
