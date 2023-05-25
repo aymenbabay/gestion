@@ -1,8 +1,12 @@
 package com.meta.store.werehouse.services;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +17,19 @@ import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.entity.AppUser;
 import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
+import com.meta.store.werehouse.dto.VacationDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.entity.Worker;
 import com.meta.store.werehouse.entity.Client;
 import com.meta.store.werehouse.entity.Company;
+import com.meta.store.werehouse.entity.Vacation;
 import com.meta.store.werehouse.entity.Worker;
 import com.meta.store.werehouse.entity.Worker;
+import com.meta.store.werehouse.mapper.VacationMapper;
 import com.meta.store.werehouse.mapper.WorkerMapper;
+import com.meta.store.werehouse.repository.VacationRepository;
 import com.meta.store.werehouse.repository.WorkerRepository;
 
 import jakarta.transaction.Transactional;
@@ -36,9 +44,14 @@ public class WorkerService  extends BaseService<Worker, Long>{
 	
 	private final WorkerMapper workerMapper;
 	
+	private final VacationMapper vacationMapper ;
+	
 	private final WorkerRepository workerRepository;
 
+	private final VacationRepository vacationRepository;
+
 	private final AppUserService appUserService;
+
 	
 	public ResponseEntity<WorkerDto> upDateWorker( WorkerDto workerDto, Company company) {
 		Optional<Worker> worker = workerRepository.findByIdAndCompanyId(workerDto.getId(),company.getId());
@@ -116,10 +129,9 @@ public class WorkerService  extends BaseService<Worker, Long>{
 		}
 		
 		AppUser user = appUserService.findByUserName(workerDto.getName());
-		Worker worker = new Worker();
+		Worker worker = workerMapper.mapToEntity(workerDto);
 		worker.setName(workerDto.getName());
 		worker.setUser(user);
-		worker.setSalary(workerDto.getSalary());
 		worker.setCompany(company);
 		super.insert(worker);
 		return new ResponseEntity<WorkerDto>(HttpStatus.ACCEPTED);
@@ -133,5 +145,34 @@ public class WorkerService  extends BaseService<Worker, Long>{
 		}
 	 super.deleteById(id,company.getId());
 	}
+
+	public void addVacation(VacationDto vacationDto, Company company) {
+		ResponseEntity<Worker> worker = super.getById(vacationDto.getWorker().getId());
+		Vacation vacation = vacationMapper.mapToEntity(vacationDto);
+		long differenceInDays = TimeUnit.DAYS.convert(vacation.getEnddate().getTime() - vacation.getStartdate().getTime(), TimeUnit.MILLISECONDS);
+		int year = getYearFromDate(vacation.getStartdate());
+		vacation.setRemainingday(vacation.getRemainingday()-differenceInDays);  
+		vacation.setUsedday(vacation.getUsedday()+differenceInDays);
+		vacation.setYear(year);
+		vacation.setWorker(worker.getBody());
+		vacation.setCompany(company);
+		vacationRepository.save(vacation);
+	}
+
+	public List<VacationDto> getWorkerHistory(Company company, Long id) {
+		List<Vacation> vacations = vacationRepository.findByCompanyIdAndWorkerId(company.getId(),id);
+		List<VacationDto> vacationsDto = new ArrayList<>();
+		for(Vacation i : vacations) {
+			VacationDto vacationDto = vacationMapper.mapToDto(i);
+			vacationsDto.add(vacationDto);
+		}
+ 		return vacationsDto;
+	}
+	
+	  private static int getYearFromDate(Date date) {
+	        Calendar calendar = Calendar.getInstance();
+	        calendar.setTime(date);
+	        return calendar.get(Calendar.YEAR);
+	    }
 	
 }

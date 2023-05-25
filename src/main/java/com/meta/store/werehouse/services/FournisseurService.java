@@ -60,7 +60,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 	
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName")
+	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
 	public ResponseEntity<String> addExistFournisseur(Long id, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 		if(fournisseur != null) {
@@ -82,18 +82,24 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 
 
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName")
-	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(FournisseurDto2 fournisseurDto, Company company) {
+	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
+	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(Company company) {
 		Optional<Fournisseur> fournisseur2 = fournisseurRepository.findByUserId(company.getUser().getId());
 		if(fournisseur2.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Fournisseur");
 		}
-		Optional<Fournisseur> fournisseur = fournisseurRepository.findByCode(fournisseurDto.getCode());
+		Optional<Fournisseur> fournisseur = fournisseurRepository.findByCode(company.getCode());
 		if(fournisseur.isPresent()) {
-			throw new RecordIsAlreadyExist("This Fournisseur Code Is Already Exist");
+			throw new RecordIsAlreadyExist("This Fournisseur Code Is Already Exist Please Choose Another One");
 		}
-		Fournisseur fournisseur1 = fournisseurMapper2.mapToEntity(fournisseurDto);
+		Fournisseur fournisseur1 = fournisseurMapper.mapCompanyToFournisseur(company);
+		Set<Company> companies = new HashSet<>();
 		fournisseur1.setUser(company.getUser());
+		fournisseur1.setCredit((double)0);
+		fournisseur1.setMvt((double)0);
+		fournisseur1.setNature("personne Moral");
+		companies.add(company);
+		fournisseur1.setCompanies(companies);
 		super.insert(fournisseur1);
 		return null;
 	}
@@ -112,7 +118,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		return fournisseurDto2;
 	}
 
-	@Cacheable(value = "fournisseur", key = "#root.methodName")
+	@Cacheable(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
 	public FournisseurDto getMyByCodeAndCompanyId(@Valid String code, Company company) {
 		Optional<Fournisseur> fournisseur = fournisseurRepository.findByCodeAndCompanyId(code,company.getId());
 		if(fournisseur.isPresent()) {
@@ -121,7 +127,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		}else throw new RecordNotFoundException("There Is No Fournisseur Has Code : "+code);
 	}
 
-	@Cacheable(value = "fournisseur", key = "#root.methodName")
+	@Cacheable(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
 	public List<FournisseurDto> getMyByNameAndCompanyId(@Valid String name, Company company) {
 		List<Fournisseur> fournisseur = fournisseurRepository.findByNameAndCompanyId(name,company.getId());
 		if(fournisseur.isEmpty()) {
@@ -151,7 +157,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@Cacheable(value = "fournisseur", key = "#root.methodName")
+	//@Cacheable(value = "fournisseur", key = "#root.methodName")
 	public FournisseurDto getFournisseurByCode(String code) {
 		Optional<Fournisseur> fournisseur = fournisseurRepository.findByCode(code);
 		if(fournisseur.isEmpty()) {
@@ -165,7 +171,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@Cacheable(value = "fournisseur", key = "#root.methodName")
+	//@Cacheable(value = "fournisseur", key = "#root.methodName")
 	public List<FournisseurDto> getAllFournisseurByName(String name) {
 		List<Fournisseur> fournisseurs = fournisseurRepository.findByName(name);
 		if(fournisseurs.isEmpty()) {
@@ -180,7 +186,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName", allEntries = true)
+	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public FournisseurDto upDateMyFournisseurById(Long id, FournisseurDto fournisseurDto, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 		if(fournisseur == null) {
@@ -210,7 +216,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName", allEntries = true)
+	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public void deleteFournisseurById(Long id, Long userId, String userName, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 	        if (fournisseur == null || company == null) {
@@ -248,6 +254,67 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 		meProvider.setCompanies(companies);
 		meProvider.setUser(company.getUser());
 		fournisseurRepository.save(meProvider);
+	}
+
+
+	public List<FournisseurDto> getAllFournisseurHasUserId() {
+		List<Fournisseur> fournisseurs = fournisseurRepository.findAllHasUserId();
+		if(fournisseurs == null) {
+			throw new RecordNotFoundException("There Is No Fournisseur Yet");
+		}
+		List<FournisseurDto> fournisseursDto = new ArrayList<>();
+		for(Fournisseur i : fournisseurs) {
+			FournisseurDto fournisseurDto = fournisseurMapper.mapToDto(i);
+			fournisseursDto.add(fournisseurDto);
+		}
+		return fournisseursDto;
+	}
+
+
+	public List<FournisseurDto> getAllMyVirtaul(Company company) {
+		List<Fournisseur> fournisseurs = fournisseurRepository.findAllMyVirtual(company.getId());
+		if(fournisseurs ==null) {
+			return null;
+		}
+		List<FournisseurDto> fournisseursDto = new ArrayList<>();
+		for (Fournisseur i : fournisseurs) {
+			FournisseurDto fournisseurDto = fournisseurMapper.mapToDto(i);
+			fournisseursDto.add(fournisseurDto);
+		}
+		return fournisseursDto;
+	}
+
+
+	public boolean existsById(Long id) {
+		boolean existProvider = fournisseurRepository.existsById(id);
+		if(!existProvider) {
+			throw new RecordNotFoundException("there is no Provider with id "+id);
+		}
+		return true;
+	}
+
+
+	public boolean existsMyProvider(Long companyId, Long providerId) {
+		boolean existsMyProvider = fournisseurRepository.existsMyProvider(companyId, providerId);
+		if(!existsMyProvider) {
+			throw new RecordNotFoundException("Please get add this Provider befor");
+		}
+		return true;
+	}
+
+
+	public Optional<Fournisseur> getMe(Long id) {
+		Optional<Fournisseur> fournisseur = fournisseurRepository.findByUserId(id);
+		return fournisseur;
+	}
+
+
+	public boolean existRelationBetweenProviderAndCompany(Long idProvider, Long id) {
+		boolean exist = fournisseurRepository.existsMyProvider(id,idProvider);
+		if(!exist) {
+			throw new RecordNotFoundException("this provider is not your provider please send add request befor");
+		}
+		return true;
 	}
 	
 	

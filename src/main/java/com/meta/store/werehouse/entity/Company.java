@@ -12,6 +12,7 @@ import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.security.entity.AppUser;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -19,6 +20,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,9 +39,13 @@ public class Company extends BaseEntity<Long> implements Serializable{
 	@NotBlank(message = "Company Name Must Be Not Empty")
 	private String name;
 	
-	private String identityNumber;
+	@NotBlank(message = "company code must be not empty")
+	@Column(unique = true)
+	private String code;
 	
-	private String nationalIdNumber;
+	private String matfisc;
+	
+	//private String nationalIdNumber;
 	
 	private String address;
 	
@@ -51,19 +57,25 @@ public class Company extends BaseEntity<Long> implements Serializable{
 	
 	private int workForce;
 	
-	private String legalStructure;
+	//private String legalStructure;
 	
-	private String taxStatus;
+	//private String taxStatus;
 	
 	private String phone;
 	
+	@Email
 	private String email;
+	
+	private double rate;
+	
+	private int raters;
 	
 	@OneToOne()
 	@JoinColumn(name = "user_id")
 	private AppUser user;
 	
 
+	
 
 	
 }

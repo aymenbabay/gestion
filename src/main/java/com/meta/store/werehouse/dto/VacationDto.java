@@ -2,6 +2,7 @@ package com.meta.store.werehouse.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.werehouse.entity.Worker;
@@ -22,11 +23,11 @@ public class VacationDto extends BaseDto<Long> implements Serializable{
 	
 	private long remainingday;
 		
-	private LocalDateTime year;
+	private int year;
 	
-	private LocalDateTime startdate;
+	private Date startdate;
 	
-	private LocalDateTime enddate;
+	private Date enddate;
 		
 	private Worker worker;
 }

@@ -82,7 +82,10 @@ public class CompanyController {
 		return companyService.upDateCompany(companyDto);
 	}
 	
-
+	@GetMapping("/rate/{id}/{rate}")
+	public void rateCompany(@PathVariable long id, @PathVariable long rate) {
+		companyService.rateCompany(id,rate);
+	}
 	
 	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();

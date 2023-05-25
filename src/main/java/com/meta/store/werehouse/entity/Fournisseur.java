@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -8,6 +9,7 @@ import com.meta.store.base.Entity.BaseEntity;
 import com.meta.store.base.security.entity.AppUser;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -27,7 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="fournisseur_werehouse")
-public class Fournisseur extends BaseEntity<Long> {
+public class Fournisseur extends BaseEntity<Long> implements Serializable{
 
 	@NotBlank(message = "Supplier Name Field Must Not Be Empty")
 	private String name;
@@ -49,8 +51,11 @@ public class Fournisseur extends BaseEntity<Long> {
 	@Email
 	private String email;
 	
+	private String matfisc;
+	
 	@ManyToMany
-	@JoinTable(name = "company_fournisseur", joinColumns = @JoinColumn(name="company_id"), inverseJoinColumns = @JoinColumn(name="fournisseur_id"))
+	@JoinTable(name = "company_fournisseur", joinColumns = @JoinColumn(name="company_id"), 
+				inverseJoinColumns = @JoinColumn(name="fournisseur_id"))
 	private Set<Company> companies = new HashSet<>();
 	
 

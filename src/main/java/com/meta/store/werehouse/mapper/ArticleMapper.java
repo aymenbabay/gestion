@@ -14,7 +14,7 @@ public interface ArticleMapper {
 	
 	//ArticleMapper MAPPER = Mappers.getMapper(ArticleMapper.class);
 
-	//@Mapping(source = "libelle", target = "libell")
+	//@Mapping(source = "fournisseur", target = "provider")
 	ArticleDto mapToDto (Article entity);
 	
 	@InheritInverseConfiguration

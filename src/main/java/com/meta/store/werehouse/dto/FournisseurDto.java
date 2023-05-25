@@ -10,6 +10,7 @@ import com.meta.store.base.Entity.BaseDto;
 import com.meta.store.base.security.entity.AppUser;
 import com.meta.store.werehouse.entity.Article;
 import com.meta.store.werehouse.entity.Company;
+import com.meta.store.werehouse.entity.Fournisseur;
 import com.meta.store.werehouse.entity.SousCategory;
 
 import jakarta.validation.constraints.Email;
@@ -37,10 +38,14 @@ public class FournisseurDto extends BaseDto<Long> implements Serializable {
 	private String phone;
 	
 	private String address;
+
+	private String matfisc;
 	
 	@Email
 	private String email;
 
 	private AppUser user;
+	
+	private Company company;
 	
 }

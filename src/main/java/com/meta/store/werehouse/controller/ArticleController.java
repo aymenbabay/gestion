@@ -28,6 +28,7 @@ import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
 import com.meta.store.werehouse.dto.ArticleDto;
+import com.meta.store.werehouse.dto.CompanyArticleDto;
 import com.meta.store.werehouse.dto.CompanyDto;
 import com.meta.store.werehouse.entity.Article;
 import com.meta.store.werehouse.entity.Company;
@@ -59,7 +60,7 @@ public class ArticleController {
 	
 	@GetMapping("/{articlenamecontaining}")
 	public List<ArticleDto> getByNameContaining(@PathVariable String articlenamecontaining ){
-		Company company = getCompany();
+		Company company = getCompany(); 
 		return articleService.getByNameContaining(articlenamecontaining,company);
 	}
 	
@@ -71,12 +72,14 @@ public class ArticleController {
 	
 	@GetMapping("/getbycompany/{id}")
 	public List<ArticleDto> getArticleByCompany(@PathVariable Long id){
-		if(id !=0) {
+		System.out.println("article controller get al by company");
+		if(id !=(long)0) {
+			System.out.println("article controller get al by company if id = 0");
 			ResponseEntity<Company> company = companyService.getById(id);
 			return articleService.getArticleByCompany(company.getBody());
 		}
 		Company company = getCompany();
-		System.out.println(id+"ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc");
+		System.out.println("article controller get al by company if id != 0 "+company.getId());
 		return articleService.getArticleByCompany(company);
 	}
 	
@@ -86,13 +89,28 @@ public class ArticleController {
 		return articleService.getArticleById(name,companyId);
 	}
 	
+	
+	@GetMapping("/getAllProvidersArticleByProviderId/{id}")
+	public List<ArticleDto> getAllMyVirtual(@PathVariable Long id) {
+		Company company = getCompany();
+		return articleService.getAllProvidersArticleByProviderId(company,id);
+	}
+	
+	
 	@PostMapping("/add")
 	public ResponseEntity<ArticleDto> insertArticle(
 			 @RequestParam(value ="file", required = false) MultipartFile file,
 			 @RequestParam("article") String article)
 			throws Exception{
 		Company company = getCompany();
+		System.out.println(article);
 		return articleService.insertArticle(file,article,company);
+	}
+	
+	@PostMapping("/add_exist")
+	public void insertExistArticle(@RequestBody CompanyArticleDto companyArticleDto) {
+		Company company = getCompany();
+		articleService.insertExistArticle(companyArticleDto, company);
 	}
 	
 	@PutMapping("/update")

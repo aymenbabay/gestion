@@ -2,9 +2,9 @@ package com.meta.store.werehouse.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.meta.store.base.Entity.BaseEntity;
-import com.meta.store.base.security.entity.AppUser;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -28,14 +28,18 @@ public class Vacation extends BaseEntity<Long> implements Serializable{
 	
 	private long remainingday;
 		
-	private LocalDateTime year;
+	private int year;
 	
-	private LocalDateTime startdate;
+	private Date startdate;
 	
-	private LocalDateTime enddate;
+	private Date enddate;
 	
 	
 	@OneToOne()
 	@JoinColumn(name = "worker_id",referencedColumnName = "id")
 	private Worker worker;
+	
+	@OneToOne()
+	@JoinColumn(name = "company_id",referencedColumnName = "id")
+	private Company company;
 }

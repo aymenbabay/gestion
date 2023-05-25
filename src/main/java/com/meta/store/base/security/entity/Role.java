@@ -1,5 +1,7 @@
 package com.meta.store.base.security.entity;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.meta.store.base.Entity.BaseEntity;
 
@@ -16,7 +18,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Role extends BaseEntity<Long>{
+public class Role extends BaseEntity<Long> implements Serializable{
 
 	
 

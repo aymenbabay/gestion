@@ -55,12 +55,7 @@ public class FournisseurController {
 		return fournisseurService.addExistFournisseur(id,company);
 	}
 	
-	@PostMapping("/add_me_exist")
-	public ResponseEntity<FournisseurDto2> addMeAsFournisseur(@RequestBody FournisseurDto2 fournisseurDto){
-		Company company = getCompany();
-		return fournisseurService.addMeAsFournisseur(fournisseurDto,company);
-	}
-	
+	// a verifier cause i don't need it
 	@GetMapping("/add_me/{code}")
 	public void addMeAsProvider(@PathVariable String code) {
 		Company company = getCompany();
@@ -74,6 +69,11 @@ public class FournisseurController {
 		return fournisseurService.getMybyCompanyId(company);
 	}
 	
+	@GetMapping("/get_all_my_virtual")
+	public List<FournisseurDto> getAllMyVirtual() {
+		Company company = getCompany();
+		return fournisseurService.getAllMyVirtaul(company);
+	}
 	@GetMapping("/get_my_by_code/{code}")
 	public FournisseurDto getMyByCode(@PathVariable @Valid String code) {
 		Company company = getCompany();
@@ -88,7 +88,7 @@ public class FournisseurController {
 	
 	@GetMapping("/get_all")
 	public List<FournisseurDto> getAll() {
-		return fournisseurService.getAllFournisseur();
+		return fournisseurService.getAllFournisseurHasUserId();
 				
 	}
 	

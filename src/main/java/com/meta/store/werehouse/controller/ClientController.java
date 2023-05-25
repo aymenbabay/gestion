@@ -50,7 +50,8 @@ public class ClientController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<ClientDto> insertClient(@RequestBody @Valid ClientDto clientDto){
-		return clientService.insertClient(clientDto);
+		Company company = getCompany();
+		return clientService.insertClient(clientDto, company);
 	}
 	
 	@GetMapping("/add_exist/{id}")
@@ -64,13 +65,7 @@ public class ClientController {
 		Company company = getCompany();
 		return clientService.addMeAsClientExist(clientDto,company);
 	}
-	
-	@GetMapping("/add_me/{code}")
-	public void addMeAsClient(@PathVariable String code) {
-		Company company = getCompany();
-		clientService.addMeAsClient(company, code);
-		
-	}
+	 
 	
 	@GetMapping("/get_all_my")
 	public List<ClientDto> getMybyCompany() {
@@ -92,7 +87,7 @@ public class ClientController {
 	
 	@GetMapping("/get_all")
 	public List<ClientDto> getAll() {
-		return clientService.getAllClient();
+		return clientService.getAllPermissionClient();
 				
 	}
 	

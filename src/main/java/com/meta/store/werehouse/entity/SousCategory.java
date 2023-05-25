@@ -1,5 +1,6 @@
 package com.meta.store.werehouse.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name="sous_category_werehouse")
-public class SousCategory extends BaseEntity<Long> {
+public class SousCategory extends BaseEntity<Long>  implements Serializable{
 
 	@NotBlank(message = "Code Field Must Not Be Empty")
 	private String code;

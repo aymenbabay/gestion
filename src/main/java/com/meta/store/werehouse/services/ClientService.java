@@ -47,16 +47,11 @@ public class ClientService extends BaseService<Client, Long> {
 	
 	private final ClientRepository clientRepository;
 
-	private final JwtAuthenticationFilter authenticationFilter;
-	
-	private final AppUserService appUserService;
-	
-	private final CompanyService companyService;
 
 	
 	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public ResponseEntity<ClientDto> insertClient(@Valid ClientDto clientDto) {
-		Company company = getCompany();
+	public ResponseEntity<ClientDto> insertClient(ClientDto clientDto,Company company) {
+		
 		if(company == null) {
 			throw new RecordNotFoundException("You Have No Company Please Create One first");
 		}else {
@@ -77,7 +72,9 @@ public class ClientService extends BaseService<Client, Long> {
 	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public ResponseEntity<String> addExistClient(Long id, Company company) {
 		ResponseEntity<Client> client = super.getById(id);
-		if(client != null) {
+		if(client == null) {
+			throw new RecordNotFoundException("This Client Is Not Exist Please Create it For You");
+		} 
 			for(Company i :client.getBody().getCompanies()) {
 				if(i == company) {
 					throw new RecordIsAlreadyExist("This Client Is Already Exist");
@@ -89,8 +86,6 @@ public class ClientService extends BaseService<Client, Long> {
 			client.getBody().setCompanies(companies);
 			super.insert(client.getBody());
 			return null;
-		}else 
-		throw new RecordNotFoundException("This Client Is Not Exist Please Create it For You");
 		
 	}
 
@@ -250,24 +245,19 @@ public class ClientService extends BaseService<Client, Long> {
 
 
 	@CacheEvict(value = "client", key = "#root.methodName + '_' + #company.id", allEntries = true)
-	public void addMeAsClient(Company company, String code) {
+	public void addMeAsClient(Company company) {
 		Optional<Client> client = clientRepository.findByUserId(company.getUser().getId());
 		if(client.isPresent()) {
 			throw new RecordIsAlreadyExist("You Are Already Client");
 		}
-		Optional<Client> client1 = clientRepository.findByCode(code);
+		Optional<Client> client1 = clientRepository.findByCode(company.getCode());
 		if(client1.isPresent()) {
 			throw new RecordIsAlreadyExist("This Code is already found Please Try another Code");
 		}
-		Client meClient = new Client();
-		meClient.setCode(code);
-		meClient.setName(company.getName());
-		meClient.setAddress(company.getAddress());
+		Client meClient = clientMapper.mapCompanyToClient(company);
 		meClient.setCredit((double)0);
-		meClient.setEmail(company.getEmail());
 		meClient.setMvt((double)0);
 		meClient.setNature("personne Moral");
-		meClient.setPhone(company.getPhone());
 		Set<Company> companies = new HashSet<>();
 		companies.add(company);
 		meClient.setCompanies(companies);
@@ -275,16 +265,22 @@ public class ClientService extends BaseService<Client, Long> {
 		clientRepository.save(meClient);
 		
 	}
-	
-	private Company getCompany() {
-		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
-		Company company = companyService.findCompanyIdByUserId(userId);
-		if(company != null) {
-			return company;
+
+
+	public List<ClientDto> getAllPermissionClient() {
+		List<Client> clients = clientRepository.findAllHasUserId();
+		if(clients == null) {
+			throw new RecordNotFoundException("There Is No Client Yet");
 		}
-			throw new RecordNotFoundException("You Dont Have A Company Please Create One If You Need ");
-			
+		List<ClientDto> clientsDto = new ArrayList<>();
+		for(Client i : clients) {
+			ClientDto clientDto = clientMapper.mapToDto(i);
+			clientsDto.add(clientDto);
+		}
+		return clientsDto;
 	}
+	
+	
 	
 
 }

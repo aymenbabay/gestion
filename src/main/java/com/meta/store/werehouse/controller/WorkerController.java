@@ -14,22 +14,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meta.store.base.error.RecordIsAlreadyExist;
 import com.meta.store.base.error.RecordNotFoundException;
 import com.meta.store.base.security.config.JwtAuthenticationFilter;
 import com.meta.store.base.security.entity.AppUser;
 import com.meta.store.base.security.service.AppUserService;
 import com.meta.store.base.service.BaseService;
+import com.meta.store.werehouse.dto.VacationDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.dto.WorkerDto;
 import com.meta.store.werehouse.entity.Worker;
 import com.meta.store.werehouse.entity.Worker;
 import com.meta.store.werehouse.entity.Company;
+import com.meta.store.werehouse.entity.Vacation;
 import com.meta.store.werehouse.entity.Worker;
 import com.meta.store.werehouse.mapper.WorkerMapper;
+import com.meta.store.werehouse.repository.VacationRepository;
+import com.meta.store.werehouse.repository.WorkerRepository;
 import com.meta.store.werehouse.services.CompanyService;
 import com.meta.store.werehouse.services.WorkerService;
 
@@ -42,16 +50,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WorkerController {
 	
-private final BaseService<Worker, Long> baseService;
-	
-	private final WorkerMapper workerMapper;
 	
 	private final WorkerService workerService;
 	
 	private final JwtAuthenticationFilter authenticationFilter;
 	
 	private final AppUserService appUserService;
+	
 	private final CompanyService companyService;
+	
 	
 	@GetMapping("/getbycompany")
 	public ResponseEntity<List<WorkerDto>> getWorkerByCompany(){
@@ -83,6 +90,18 @@ private final BaseService<Worker, Long> baseService;
 		Company company = getCompany();
 			workerService.deleteWorkerById(id,company);
 		}
+	
+	@PostMapping("/addvacation")
+	public void addVacation( @RequestBody VacationDto vacationDto) {
+		Company company = getCompany();
+		workerService.addVacation(vacationDto,company);
+		}
+	
+	@GetMapping("/history/{id}")
+	public List<VacationDto> getWorkerHistory(@PathVariable Long id) {
+		Company company = getCompany();
+		return workerService.getWorkerHistory(company,id);
+	}
 	
 	private Company getCompany() {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();

@@ -38,9 +38,10 @@ public class CompanyDto extends BaseDto<Long> implements Serializable{
 	@NotBlank(message = "CompanyName Must Be Not Empty")
 	private String name;
 	
-	private String identityNumber;
-
-	private String nationalIdNumber;
+	//private String identityNumber;
+	private String code;
+	
+	private String matfisc;
 	
 	private String address;
 	
@@ -52,15 +53,19 @@ public class CompanyDto extends BaseDto<Long> implements Serializable{
 	
 	private int workForce;
 	
-	private String legalStructure;
+	//private String legalStructure;
 	
-	private String taxStatus;
+	//private String taxStatus;
 	
 	private String phone;
 	
 	private String email;
 	
 	private AppUser user;
+	
+	private double rate;
+	
+	private int raters;
 	
 	//private Set<Client> clients = new HashSet<>();
 

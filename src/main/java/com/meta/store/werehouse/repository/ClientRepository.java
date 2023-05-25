@@ -30,11 +30,14 @@ public interface ClientRepository extends BaseRepository<Client, Long> {
 	
 
 	@Query("SELECT c FROM Client c JOIN c.companies co WHERE co.id = :companyId AND c.name = :name")
-	List<Client> findByNameAndCompanyId(@Valid String name, Long companyId);
+	List<Client> findByNameAndCompanyId( String name, Long companyId);
 
 
 	Optional<Client> findByUserId(Long userId);
-	
+
+	@Query("SELECT c FROM Client c WHERE c.user.id IS NOT NULL")
+	List<Client> findAllHasUserId();
+
 	
 	
 //	@Modifying
