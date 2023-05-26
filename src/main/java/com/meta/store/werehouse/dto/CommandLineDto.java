@@ -3,10 +3,12 @@ package com.meta.store.werehouse.dto;
 import java.io.Serializable;
 
 import com.meta.store.base.Entity.BaseDto;
+import com.meta.store.werehouse.entity.Article;
 import com.meta.store.werehouse.entity.Invoice;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,21 +16,25 @@ import lombok.Setter;
 @Setter
 public class CommandLineDto extends BaseDto<Long> implements Serializable{
 
-	private String codeArticle;
+	//private String codeArticle;
 	
-	private String libelleArticle;
+	//private String libelleArticle;
 	
 	private Double quantity;
 	
-	private String unit;
+	//private String unit;
 
-	private Double tva;
+	//private Double tva;
 	
-	private Double prixArticleUnit;
+	//private Double prixArticleUnit;
 
 	private Invoice invoice;
 
 	private Double totTva;
 
 	private Double prixArticleTot;
+	
+	private Article article;
+	
+	
 }

@@ -70,7 +70,7 @@ public class Article extends BaseEntity<Long> implements Serializable{
 	
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "company_article",
+	@JoinTable(name = "company_articl",
 				joinColumns = @JoinColumn(name="article_id"), 
 				inverseJoinColumns = @JoinColumn(name="company_id"))//,referencedColumnName = "id"
 	private Set<Company> companies = new HashSet<>();

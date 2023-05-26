@@ -58,6 +58,7 @@ public class CommandLineController {
 		Long userId = appUserService.findByUserName(authenticationFilter.userName).getId();
 		Company company = companyService.findCompanyIdByUserId(userId);
 		commandLineService.insertLine(commandLinesDto, company);
+		
 		if (type.equals("pdf-save-client") ) {	
 			List<CommandLine> commandLines = commandLineService.getCommandLineByInvoiceId(code);
 			return invoiceService.export(company,commandLines);

@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompanyArticleDto extends BaseDto<Long> implements Serializable {
+public class CompanyArticleDto implements Serializable {
 
 	
 	private String discription;

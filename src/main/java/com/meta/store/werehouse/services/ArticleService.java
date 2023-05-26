@@ -130,16 +130,11 @@ public class ArticleService extends BaseService<Article, Long> {
 
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public ResponseEntity<ArticleDto> insertArticle( MultipartFile file, String article3, Company company) throws JsonMappingException, JsonProcessingException {
-		System.out.println("article service insert article first of function");
 		ArticleDto articleDto = new ObjectMapper().readValue(article3, ArticleDto.class);
-		System.out.println("article service insert article apres Object mapper");
 		if(file != null) {
-			System.out.println("article service insert article file not null");
-			
 			String newFileName = imageService.insertImag(file,company.getUser().getUsername(), "article");
 			articleDto.setImage(newFileName);
 				}
-		System.out.println("article service insert article out of insert img");
 		Optional<Article> article1 = articleRepository.findByLibelleAndCompanyId(articleDto.getLibelle(),company.getId());
 		Optional<Article> article2 = articleRepository.findByCodeAndCompanyId(articleDto.getCode(),company.getId());
 		
@@ -152,13 +147,10 @@ public class ArticleService extends BaseService<Article, Long> {
 		if(article2.isPresent()) {
 			throw new RecordIsAlreadyExist("Article code Is Already Exist");
 		}
-		System.out.println("article service insert article befor article mapper");
 		Article article = articleMapper.mapToEntity(articleDto);
 		Set<Company> companies = new HashSet<>();
 		companies.add(company);
-		System.out.println("article service insert article apres add companies to company");
 		article.setCompanies(companies);
-		System.out.println("article service insert article apres set companies  ");
 		if(articleDto.getFournisseur() == null) {
 			Optional<Fournisseur> fournisseur = providerService.getMe(company.getUser().getId());
 			article.setFournisseur(fournisseur.get());
@@ -168,8 +160,14 @@ public class ArticleService extends BaseService<Article, Long> {
 				article.setFournisseur(articleDto.getFournisseur());
 			}	
 		}
-		System.out.println("article service insert article + the first element "+article.getCompanies().iterator().next().getId()+"article id"+article.getId());
-		super.insert(article);
+		articleRepository.save(article);
+		Optional<CompanyArticle> companyArticl = companyArticleRepository.findByArticleId(article.getId());
+		companyArticl.get().setCost(article.getCost());
+		companyArticl.get().setDiscription(article.getDiscription());
+		companyArticl.get().setMinQuantity(article.getMinQuantity());
+		companyArticl.get().setQuantity(article.getQuantity());
+		companyArticl.get().setSellingPrice(article.getSellingPrice());
+		companyArticl.get().setTva(article.getTva());
 		inventoryService.makeInventory(article, company);
 		return new ResponseEntity<ArticleDto>(HttpStatus.ACCEPTED);
 		
@@ -179,7 +177,7 @@ public class ArticleService extends BaseService<Article, Long> {
 	@CacheEvict(value = "article", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public void insertExistArticle(CompanyArticleDto companyArticleDto, Company company ) {
 		Long idProvider = companyArticleDto.getArticle().getFournisseur().getId();
-		boolean existRelation = providerService.existRelationBetweenProviderAndCompany(idProvider,company.getId());
+		boolean existRelation = providerService.existRelationBetweenProviderAndCompany(idProvider,company.getId());//if no relation it throw an exception
 		String codeArticle = companyArticleDto.getArticle().getCode();
 		boolean existArticle = articleRepository.existsByCodeAndFournisseurId(codeArticle, idProvider);
 		if(!existArticle) {

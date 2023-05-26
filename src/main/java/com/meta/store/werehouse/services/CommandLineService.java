@@ -47,30 +47,28 @@ public class CommandLineService extends BaseService<CommandLine, Long>{
 		List<Article> articles = new ArrayList<>();
 		InvoiceDto invoiceDto = invoiceService.getLastInvoice(company.getId());
 		Invoice invoice = invoiceMapper.mapToEntity(invoiceDto);
-		System.out.println("command lineeeeeeeeeeeeeeeeeeeeeeeeeeeee service"+commandLinesDto.get(0).getCodeArticle()+"//////////"+commandLinesDto.get(1).getCodeArticle());
 		
 		for(CommandLineDto i : commandLinesDto) {
-			Article article = articleService.findByCodeAndCompanyId(i.getCodeArticle(),company);
-			System.out.println(article.getCode()+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-			articles.add(article);
-			if(article.getQuantity()-i.getQuantity()<0) {
-				throw new RecordNotFoundException("There Is No More "+i.getLibelleArticle());
+		//	Article article = articleService.findByCodeAndCompanyId(i.getCodeArticle(),company);
+			articles.add(i.getArticle());
+			if(i.getArticle().getQuantity()-i.getQuantity()<0) {
+				throw new RecordNotFoundException("There Is No More "+i.getArticle().getLibelle());
 			}
-			article.setQuantity(article.getQuantity()-i.getQuantity());
-			articleService.insert(article);
+			i.getArticle().setQuantity(i.getArticle().getQuantity()-i.getQuantity());
+			articleService.insert(i.getArticle());
 		CommandLine commandLine = commandLineMapper.mapToEntity(i);
 		commandLine.setInvoice(invoice);
-		String prix_article_tot = df.format(i.getQuantity()*article.getSellingPrice());
+		String prix_article_tot = df.format(i.getQuantity()*i.getArticle().getSellingPrice());
 		prix_article_tot = prix_article_tot.replace(",", ".");
 		commandLine.setPrix_article_tot(Double.parseDouble(prix_article_tot));
-		commandLine.setPrix_article_unit(article.getSellingPrice());
-		commandLine.setTva(article.getTva());
-		String tot_tva = df.format(article.getTva()*i.getQuantity()*article.getSellingPrice()/100);
+	//	commandLine.setPrix_article_unit(i.getArticle().getSellingPrice());
+	//	commandLine.setTva(article.getTva());
+		String tot_tva = df.format(i.getArticle().getTva()*i.getQuantity()*i.getArticle().getSellingPrice()/100);
 		tot_tva = tot_tva.replace(",", ".");
 		commandLine.setTot_tva(Double.parseDouble(tot_tva));
-		commandLine.setUnit(article.getUnit());
-		commandLine.setLibelle_article(article.getLibelle());
-		commandLine.setCode_article(article.getCode());
+	//	commandLine.setUnit(article.getUnit());
+	//	commandLine.setLibelle_article(article.getLibelle());
+	//	commandLine.setCode_article(article.getCode());
 		commandLines.add(commandLine);
 		}
 		super.insertAll(commandLines);

@@ -52,7 +52,7 @@ public class InvoiceController {
 				
 	}
 	
-	//cause it's use in client service
+	//cause it's used in client service
 	@PostMapping("/add")
 	public ResponseEntity<InvoiceDto> insertInvoice(@RequestBody @Valid Client client){
 		Company company = getCompany();

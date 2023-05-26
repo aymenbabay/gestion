@@ -127,7 +127,7 @@ public class exportInvoicePdf {
 		
 		for(CommandLine i : commandLines) {
 			
-		PdfPCell libelleCell = new PdfPCell(new Phrase(i.getLibelle_article()));
+		PdfPCell libelleCell = new PdfPCell(new Phrase(i.getArticle().getLibelle()));
 		libelleCell.setPaddingLeft(1);
 		libelleCell.setVerticalAlignment(Element.ALIGN_CENTER);
 		libelleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -140,19 +140,19 @@ public class exportInvoicePdf {
 		qteCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		table.addCell(qteCell);
 		
-		PdfPCell unitCell = new PdfPCell(new Phrase(i.getUnit()));
+		PdfPCell unitCell = new PdfPCell(new Phrase(i.getArticle().getUnit()));
 		unitCell.setPaddingLeft(1);
 		unitCell.setVerticalAlignment(Element.ALIGN_CENTER);
 		unitCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		table.addCell(unitCell);
 		
-		PdfPCell tvaCell = new PdfPCell(new Phrase(i.getTva().toString()));
+		PdfPCell tvaCell = new PdfPCell(new Phrase(i.getArticle().getTva().toString()));
 		tvaCell.setPaddingLeft(1);
 		tvaCell.setVerticalAlignment(Element.ALIGN_CENTER);
 		tvaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		table.addCell(tvaCell);
 		
-		PdfPCell puCell = new PdfPCell(new Phrase(i.getPrix_article_unit().toString()));
+		PdfPCell puCell = new PdfPCell(new Phrase(i.getArticle().getSellingPrice().toString()));
 		puCell.setPaddingLeft(1);
 		puCell.setVerticalAlignment(Element.ALIGN_CENTER);
 		puCell.setHorizontalAlignment(Element.ALIGN_CENTER);

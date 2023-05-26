@@ -60,7 +60,7 @@ public class FournisseurService extends BaseService<Fournisseur, Long> {
 	}
 	
 
-	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id")
+	@CacheEvict(value = "fournisseur", key = "#root.methodName + '_' + #company.id", allEntries = true)
 	public ResponseEntity<String> addExistFournisseur(Long id, Company company) {
 		ResponseEntity<Fournisseur> fournisseur = super.getById(id);
 		if(fournisseur != null) {

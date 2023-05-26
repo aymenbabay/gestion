@@ -16,21 +16,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="were_house_line_command")
+@Table(name="werehouse_line_command")
 public class CommandLine extends BaseEntity<Long>{
 
 
-	private String code_article;
-	
-	private String libelle_article;
-	
+//	private String code_article;
+//	
+//	private String libelle_article;
+//	
 	private Double quantity;
-	
-	private String unit;
-
-	private Double tva;
-	
-	private Double prix_article_unit;
+//	
+//	private String unit;
+//
+//	private Double tva;
+//	
+//	private Double prix_article_unit;
 
 	private Double tot_tva;
 
@@ -39,4 +39,8 @@ public class CommandLine extends BaseEntity<Long>{
 	@ManyToOne
 	@JoinColumn(name = "invoiceId")
 	private Invoice invoice;
+	
+	@ManyToOne
+	@JoinColumn(name = "articleId")
+	private Article article;
 }

@@ -100,12 +100,12 @@ public class InventoryService extends BaseService<Inventory, Long> {
 	public void impacteInvoice( Company company, List<CommandLineDto> commandLinesDto, List<Article> articles) {
 		for(CommandLineDto i : commandLinesDto) {
 			
-		Optional<Inventory> inventory = inventoryRepository.findByCompanyIdAndArticleCode(company.getId(),i.getCodeArticle());
+		Optional<Inventory> inventory = inventoryRepository.findByCompanyIdAndArticleCode(company.getId(),i.getArticle().getCode());
 		Inventory inventori = inventory.get();
 		inventori.setOut_quantity(inventori.getOut_quantity()+i.getQuantity());
 		inventori.setCurrent_quantity(inventori.getCurrent_quantity()-i.getQuantity());
 		for(Article a : articles) {
-			if(a.getCode().equals(i.getCodeArticle())) {
+			if(a.getCode().equals(i.getArticle().getCode())) {
 				
 		inventori.setArticleSelling(inventori.getArticleSelling() + a.getCost() * i.getQuantity());
 			}
